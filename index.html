@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Misi Adab Bertetangga</title>
+<style>
+/* ==========================================================================
+   STATE AND CONFIGURATION & CSS VARIABLES
+   ========================================================================== */
+:root {
+  --primary: #0d5c63;
+  --primary-dark: #07383c;
+  --secondary: #2ECC71;
+  --accent: #F1C40F;
+  --accent-glow: rgba(241, 196, 15, 0.6);
+  --bg-cream: #FFF8E7;
+  --text-dark: #1A252C;
+  --text-light: #F8F9FA;
+  --player-a: #00D2D3;
+  --player-b: #FF6B6B;
+  --danger: #E74C3C;
+  --cell-bg-1: #4ca1af;
+  --cell-bg-2: #3b8d99;
+  --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body { font-family: var(--font-main); background: var(--primary); color: var(--text-dark); overflow: hidden; touch-action: none; }
+button { font-family: var(--font-main); cursor: pointer; border: none; outline: none; }
+h1, h2, h3 { font-weight: 800; }
+
+/* ==========================================================================
+   GLOBAL UI COMPONENTS
+   ========================================================================== */
+.screen { display: none; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; overflow: hidden; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+.screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+/* Background Patterns */
+.bg-pattern { position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0.05; pointer-events: none; background-image: radial-gradient(var(--accent) 2px, transparent 2px); background-size: 40px 40px; z-index: 0; }
+.bg-ornaments { position: absolute; width: 100%; height: 100%; top:0; left:0; pointer-events: none; z-index: 1; }
+
+.btn { padding: 12px 24px; border-radius: 50px; font-size: 1.1rem; font-weight: bold; background: var(--secondary); color: white; box-shadow: 0 6px 0px #27ae60, 0 10px 20px rgba(0,0,0,0.3); transition: all 0.2s; text-transform: uppercase; display: flex; align-items: center; gap: 10px; z-index: 10; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 0px #27ae60, 0 12px 25px rgba(0,0,0,0.4); }
+.btn:active { transform: translateY(4px); box-shadow: 0 2px 0px #27ae60, 0 5px 10px rgba(0,0,0,0.3); }
+.btn-accent { background: var(--accent); color: var(--text-dark); box-shadow: 0 6px 0px #d4ac0d; }
+.btn-accent:hover { box-shadow: 0 8px 0px #d4ac0d; }
+.btn-accent:active { box-shadow: 0 2px 0px #d4ac0d; }
+.btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); box-shadow: none; }
+.btn-outline:hover { background: rgba(241, 196, 15, 0.1); transform: none; box-shadow: none; }
+
+.panel-card { background: var(--bg-cream); border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); border: 4px solid rgba(241, 196, 15, 0.3); position: relative; z-index: 10; max-width: 900px; width: 90%; max-height: 90vh; overflow-y: auto; text-align: center; }
+
+/* ==========================================================================
+   HOME SCREEN
+   ========================================================================== */
+.hero-title { font-size: 3.5rem; color: var(--accent); text-shadow: 0 4px 10px rgba(0,0,0,0.5); text-align: center; margin-bottom: 10px; text-transform: uppercase; animation: floatTitle 3s ease-in-out infinite; }
+.hero-subtitle { font-size: 1.5rem; color: var(--text-light); margin-bottom: 40px; text-align: center; font-weight: normal; letter-spacing: 2px; }
+.home-buttons { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 30px; }
+.hero-illustration { width: 250px; height: 250px; margin: 0 auto 20px; position: relative; animation: floatChest 4s ease-in-out infinite; }
+
+@keyframes floatTitle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes floatChest { 0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 10px 15px var(--accent-glow)); } 50% { transform: translateY(-15px) scale(1.02); filter: drop-shadow(0 25px 25px var(--accent-glow)); } }
+
+/* ==========================================================================
+   SLIDE / MATERI SCREEN
+   ========================================================================== */
+.slide-container { display: flex; flex-direction: column; height: 100%; width: 100%; }
+.slide-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.slide-card { background: var(--bg-cream); border-radius: 20px; padding: 40px; width: 100%; max-width: 800px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 2px solid var(--accent); animation: slideIn 0.5s ease forwards; display: none; }
+.slide-card.active { display: block; }
+.slide-title { font-size: 2rem; color: var(--primary); border-bottom: 3px solid var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
+.slide-body { font-size: 1.2rem; line-height: 1.6; color: var(--text-dark); text-align: left; }
+.slide-body ul { padding-left: 25px; margin-top: 15px; }
+.slide-body li { margin-bottom: 10px; }
+.slide-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.3); }
+.slide-dots { display: flex; gap: 8px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: 0.3s; }
+.dot.active { background: var(--accent); transform: scale(1.3); }
+
+@keyframes slideIn { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ==========================================================================
+   CARA BERMAIN
+   ========================================================================== */
+.how-to-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; text-align: left; margin: 20px 0; }
+.step-card { background: rgba(255,255,255,0.5); padding: 15px; border-radius: 10px; border-left: 5px solid var(--accent); }
+.step-title { font-weight: bold; color: var(--primary); margin-bottom: 5px; }
+
+/* ==========================================================================
+   DIFFICULTY SCREEN
+   ========================================================================== */
+.diff-cards { display: flex; gap: 20px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
+.diff-card { background: white; border: 4px solid transparent; border-radius: 15px; padding: 30px; width: 250px; cursor: pointer; transition: all 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+.diff-card:hover { transform: translateY(-10px); border-color: var(--accent); }
+.diff-card.selected { border-color: var(--accent); background: var(--bg-cream); transform: scale(1.05); box-shadow: 0 10px 25px var(--accent-glow); }
+.diff-title { font-size: 1.8rem; font-weight: bold; margin-bottom: 10px; }
+.diff-desc { font-size: 1rem; color: #555; }
+.diff-card.mudah .diff-title { color: #2ecc71; }
+.diff-card.sedang .diff-title { color: #f39c12; }
+.diff-card.sulit .diff-title { color: #e74c3c; }
+
+/* ==========================================================================
+   GAME ARENA
+   ========================================================================== */
+#arena { flex-direction: column; justify-content: flex-start; }
+.arena-header { width: 100%; height: 70px; background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; color: white; border-bottom: 3px solid var(--accent); z-index: 10; }
+.timer { font-size: 2.5rem; font-weight: bold; font-family: monospace; color: var(--accent); text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+.timer.warning { color: var(--danger); animation: pulse 1s infinite; }
+.chest-counter { font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+
+.arena-layout { display: flex; width: 100%; height: calc(100vh - 70px); max-width: 1400px; margin: 0 auto; }
+.player-panel { flex: 1; display: flex; flex-direction: column; padding: 15px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); border-left: 2px solid rgba(255,255,255,0.2); border-right: 2px solid rgba(255,255,255,0.2); z-index: 10; max-width: 350px; }
+#panel-b { border-right: 5px solid var(--player-b); background: linear-gradient(to right, rgba(255, 107, 107, 0.1), transparent); }
+#panel-a { border-left: 5px solid var(--player-a); background: linear-gradient(to left, rgba(0, 210, 211, 0.1), transparent); }
+
+.player-info { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; background: var(--bg-cream); padding: 10px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+.avatar-thumb { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: white; }
+#panel-b .avatar-thumb { background: var(--player-b); }
+#panel-a .avatar-thumb { background: var(--player-a); }
+.player-stats p { font-size: 0.9rem; font-weight: bold; color: var(--text-dark); margin: 2px 0; }
+
+.qa-space { flex: 1; background: white; border-radius: 12px; padding: 15px; overflow-y: auto; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; display: flex; flex-direction: column; position: relative; }
+.qa-idle { text-align: center; color: #7f8c8d; margin: auto; font-style: italic; }
+.question-text { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: var(--primary); line-height: 1.4; }
+.options-grid { display: flex; flex-direction: column; gap: 8px; }
+.opt-btn { background: #ecf0f1; border: 2px solid #bdc3c7; border-radius: 8px; padding: 10px; text-align: left; transition: 0.2s; cursor: pointer; color: #2c3e50; font-weight: bold; }
+.opt-btn:hover { background: #e0e6ed; border-color: var(--primary); }
+.opt-btn.selected { background: var(--accent); border-color: #d4ac0d; color: var(--text-dark); }
+.opt-btn.correct { background: var(--secondary); border-color: #27ae60; color: white; }
+.opt-btn.wrong { background: var(--danger); border-color: #c0392b; color: white; }
+.submit-ans { margin-top: 15px; width: 100%; background: var(--primary); color: white; padding: 10px; border-radius: 8px; font-weight: bold; }
+.submit-ans:disabled { background: #95a5a6; cursor: not-allowed; }
+.feedback-box { margin-top: 15px; padding: 10px; border-radius: 8px; font-size: 0.95rem; font-weight: bold; display: none; }
+.feedback-box.show { display: block; animation: popIn 0.3s; }
+.feedback-box.correct { background: #d4efdf; color: #1e8449; border: 1px solid #27ae60; }
+.feedback-box.wrong { background: #f5b7b1; color: #c0392b; border: 1px solid #e74c3c; }
+
+.joystick-area { height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 10px; }
+.joystick-base { width: 120px; height: 120px; background: rgba(0,0,0,0.3); border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 5px 15px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.2); }
+.joystick-stick { width: 50px; height: 50px; border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.4); position: absolute; transition: transform 0.1s; display: flex; align-items: center; justify-content: center; }
+.joystick-stick::after { content: ''; width: 20px; height: 20px; background: rgba(255,255,255,0.3); border-radius: 50%; }
+#panel-b .joystick-stick { background: radial-gradient(circle at 30% 30%, #ff9e9e, var(--player-b)); border: 2px solid #e84118; }
+#panel-a .joystick-stick { background: radial-gradient(circle at 30% 30%, #48dbfb, var(--player-a)); border: 2px solid #0abde3; }
+.kbd-hint { font-size: 0.8rem; color: white; margin-top: 5px; opacity: 0.7; }
+
+/* MAP */
+.map-section { flex: 2; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; }
+.map-container { width: 100%; max-width: 600px; aspect-ratio: 1/1; background: var(--primary-dark); border: 10px solid #2c3e50; border-radius: 10px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); position: relative; overflow: hidden; display: grid; grid-template-columns: repeat(9, 1fr); grid-template-rows: repeat(9, 1fr); }
+.grid-cell { border: 1px solid rgba(255,255,255,0.05); }
+.grid-cell:nth-child(even) { background: var(--cell-bg-1); }
+.grid-cell:nth-child(odd) { background: var(--cell-bg-2); }
+
+/* Entities */
+.entity { position: absolute; width: calc(100% / 9); height: calc(100% / 9); transition: left 0.25s linear, top 0.25s linear; display: flex; align-items: center; justify-content: center; z-index: 5; pointer-events: none; }
+.avatar-entity { z-index: 7; }
+.avatar-body { width: 70%; height: 70%; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 10px rgba(0,0,0,0.5); border: 3px solid white; font-weight: bold; color: white; font-size: 1.2rem; }
+#avatar-b .avatar-body { background: var(--player-b); }
+#avatar-a .avatar-body { background: var(--player-a); }
+
+.chest-entity { z-index: 5; }
+.chest-svg { width: 80%; height: 80%; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5)); transition: 0.3s; }
+.chest-entity.available { animation: chestGlow 2s infinite; }
+.chest-entity.claimed-a { filter: drop-shadow(0 0 15px var(--player-a)); transform: scale(1.1); }
+.chest-entity.claimed-b { filter: drop-shadow(0 0 15px var(--player-b)); transform: scale(1.1); }
+.chest-entity.opened { opacity: 0; transform: scale(0) translateY(-20px); transition: 0.5s; }
+.chest-entity .lock-icon { display: none; position: absolute; top: -10px; background: rgba(0,0,0,0.7); color: white; padding: 2px 5px; border-radius: 5px; font-size: 0.7rem; font-weight: bold; }
+.chest-entity.claimed-a .lock-icon, .chest-entity.claimed-b .lock-icon { display: block; }
+.chest-entity.claimed-a .lock-icon { border: 1px solid var(--player-a); }
+.chest-entity.claimed-b .lock-icon { border: 1px solid var(--player-b); }
+
+@keyframes chestGlow { 0%, 100% { filter: drop-shadow(0 0 2px var(--accent)); transform: scale(1); } 50% { filter: drop-shadow(0 0 10px var(--accent)); transform: scale(1.05); } }
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.1); } }
+@keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+/* ==========================================================================
+   RESULTS SCREEN
+   ========================================================================== */
+#result { text-align: center; }
+.result-title { font-size: 3rem; color: var(--accent); margin-bottom: 20px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+.stats-container { display: flex; gap: 30px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap; }
+.stat-card { background: white; padding: 20px; border-radius: 15px; width: 250px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); border-top: 5px solid #ccc; }
+.stat-card.winner { transform: scale(1.1); border-color: var(--accent); box-shadow: 0 15px 30px var(--accent-glow); }
+.stat-card#stat-a { border-color: var(--player-a); }
+.stat-card#stat-b { border-color: var(--player-b); }
+.stat-name { font-size: 1.5rem; font-weight: bold; margin-bottom: 15px; }
+.stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 1.1rem; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .arena-layout { flex-direction: column; overflow-y: auto; height: auto; }
+  .map-section { order: -1; min-height: 400px; }
+  .player-panel { max-width: 100%; border: none; border-bottom: 2px solid rgba(255,255,255,0.2); flex-direction: row; flex-wrap: wrap; height: auto; }
+  .qa-space { width: 100%; margin: 10px 0; max-height: 250px; }
+  .joystick-area { width: 100%; height: auto; margin-top: 10px; }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- DECORATIVE BG -->
+  <div class="bg-pattern"></div>
+  <div class="bg-ornaments" id="particles"></div>
+
+  <!-- 1. HOME SCREEN -->
+  <section id="home" class="screen active">
+    <div class="hero-illustration">
+      <svg viewBox="0 0 100 100" width="100%" height="100%">
+        <path d="M10,40 L90,40 L85,85 L15,85 Z" fill="#D4AF37" stroke="#8C6E15" stroke-width="3"/>
+        <path d="M10,40 C10,15 90,15 90,40 Z" fill="#F1C40F" stroke="#8C6E15" stroke-width="3"/>
+        <rect x="42" y="32" width="16" height="16" rx="3" fill="#8C6E15"/>
+        <circle cx="50" cy="40" r="4" fill="#333"/>
+        <path d="M48,40 L48,46 L52,46 L52,40 Z" fill="#333"/>
+        <!-- Ornaments -->
+        <circle cx="20" cy="25" r="3" fill="white" opacity="0.6"/>
+        <circle cx="80" cy="25" r="3" fill="white" opacity="0.6"/>
+        <path d="M15,60 L85,60" stroke="#8C6E15" stroke-width="2"/>
+      </svg>
+    </div>
+    <h1 class="hero-title">Misi Adab Bertetangga</h1>
+    <h2 class="hero-subtitle">Petualangan Mencari Harta Karun</h2>
+    <div class="home-buttons">
+      <button class="btn" onclick="showScreen('materi')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg> Materi
+      </button>
+      <button class="btn" onclick="showScreen('cara-bermain')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg> Cara Bermain
+      </button>
+      <button class="btn btn-accent" onclick="showScreen('difficulty')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Mulai Bermain
+      </button>
+    </div>
+  </section>
+
+  <!-- 2. MATERI SCREEN -->
+  <section id="materi" class="screen">
+    <div class="slide-container">
+      <div class="slide-content" id="slide-content">
+        <!-- Slides injected by JS -->
+      </div>
+      <div class="slide-nav">
+        <button class="btn btn-outline" onclick="prevSlide()" id="btn-prev" style="color:white; border-color:white;">&#8592; Sebelumnya</button>
+        <div class="slide-dots" id="slide-dots"></div>
+        <button class="btn btn-accent" onclick="nextSlide()" id="btn-next">Berikutnya &#8594;</button>
+        <button class="btn btn-accent" onclick="showScreen('difficulty')" id="btn-mulai-materi" style="display:none;">Siap Berburu! &#9876;</button>
+      </div>
+      <div style="position:absolute; top:20px; right:20px;">
+        <button class="btn btn-outline" style="color:white; border-color:white;" onclick="showScreen('home')">X Tutup</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. CARA BERMAIN SCREEN -->
+  <section id="cara-bermain" class="screen">
+    <div class="panel-card" style="max-width: 1000px;">
+      <h2 class="slide-title">Cara Bermain</h2>
+      <div class="how-to-grid">
+        <div class="step-card"><div class="step-title">1. Pilih Tantangan</div><p>Pilih tingkat kesulitan (Mudah, Sedang, Sulit). Keduanya bermain di tingkat yang sama.</p></div>
+        <div class="step-card"><div class="step-title">2. Jelajahi Peta</div><p>Pemain A (Kanan) gunakan panah. Pemain B (Kiri) gunakan WASD. Atau gunakan joystick. Capai peti harta karun!</p></div>
+        <div class="step-card"><div class="step-title">3. Buka Peti</div><p>Saat menyentuh peti, peti terkunci dari lawan dan soal muncul di panelmu.</p></div>
+        <div class="step-card"><div class="step-title">4. Jawab Benar</div><p>Jawaban benar: Peti terbuka, dapat poin, peti hilang.</p></div>
+        <div class="step-card"><div class="step-title">5. Jawab Salah</div><p>Jawaban salah: Terlempar ke petak lain, poin 0, peti kembali tersedia untuk siapa saja.</p></div>
+        <div class="step-card"><div class="step-title">6. Kemenangan</div><p>Waktu 3 menit. Permainan selesai jika waktu habis atau semua 20 peti terbuka. Poin terbanyak menang!</p></div>
+      </div>
+      <div class="home-buttons">
+        <button class="btn btn-outline" onclick="showScreen('home')">Kembali</button>
+        <button class="btn btn-accent" onclick="showScreen('difficulty')">Mulai Bermain</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. DIFFICULTY SCREEN -->
+  <section id="difficulty" class="screen">
+    <div style="text-align:center; color:white; z-index:10;">
+      <h2 class="hero-title" style="font-size:2.5rem;">Pilih Tantanganmu!</h2>
+      <p class="hero-subtitle" style="margin-bottom:10px;">Siapakah pemburu harta karun terbaik?</p>
+      
+      <div class="diff-cards">
+        <div class="diff-card mudah" onclick="startGame('mudah')">
+          <div class="diff-title">MUDAH</div>
+          <div class="diff-desc">20 Soal. Menguji pengetahuan dasar akhlak. 10 Poin/Peti.</div>
+        </div>
+        <div class="diff-card sedang" onclick="startGame('sedang')">
+          <div class="diff-title">SEDANG</div>
+          <div class="diff-desc">20 Soal. Skenario sehari-hari dan penerapan. 20 Poin/Peti.</div>
+        </div>
+        <div class="diff-card sulit" onclick="startGame('sulit')">
+          <div class="diff-title">SULIT</div>
+          <div class="diff-desc">20 Soal. Analisis situasi dan dilema sosial. 30 Poin/Peti.</div>
+        </div>
+      </div>
+      <button class="btn btn-outline" style="margin-top:30px; color:white; border-color:white;" onclick="showScreen('home')">Kembali ke Beranda</button>
+    </div>
+  </section>
+
+  <!-- 5. GAME ARENA -->
+  <section id="arena" class="screen">
+    <div class="arena-header">
+      <button class="btn btn-outline" style="color:white; border-color:white; padding: 5px 15px;" onclick="confirmExit()">Keluar</button>
+      <div class="chest-counter">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#F1C40F"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 16H4v-9h4v1c0 2.21 1.79 4 4 4s4-1.79 4-4v-1h4v9z"/></svg>
+        <span id="ui-chests">0/20</span>
+      </div>
+      <div class="timer" id="ui-timer">03:00</div>
+      <div style="font-weight:bold; color:var(--accent);" id="ui-diff-label">SEDANG</div>
+    </div>
+    
+    <div class="arena-layout">
+      <!-- Player B Panel (Left) -->
+      <div class="player-panel" id="panel-b">
+        <div class="player-info">
+          <div class="avatar-thumb">B</div>
+          <div class="player-stats">
+            <h3 style="color:var(--player-b)">PLAYER B</h3>
+            <p>Skor: <span id="score-b">0</span></p>
+            <p>Peti: <span id="chest-b">0</span></p>
+          </div>
+        </div>
+        <div class="qa-space" id="qa-b">
+          <div class="qa-idle">Jelajahi peta dan temukan peti harta karun!</div>
+        </div>
+        <div class="joystick-area">
+          <div class="joystick-base" id="joy-base-b">
+            <div class="joystick-stick" id="joy-stick-b"></div>
+          </div>
+          <div class="kbd-hint">Keyboard: W A S D</div>
+        </div>
+      </div>
+
+      <!-- Map Center -->
+      <div class="map-section">
+        <div class="map-container" id="map-grid">
+          <!-- Cells generated by JS -->
+          <div class="entity avatar-entity" id="avatar-b">
+            <div class="avatar-body">B</div>
+          </div>
+          <div class="entity avatar-entity" id="avatar-a">
+            <div class="avatar-body">A</div>
+          </div>
+          <!-- Chests generated by JS -->
+        </div>
+      </div>
+
+      <!-- Player A Panel (Right) -->
+      <div class="player-panel" id="panel-a">
+        <div class="player-info">
+          <div class="avatar-thumb">A</div>
+          <div class="player-stats">
+            <h3 style="color:var(--player-a)">PLAYER A</h3>
+            <p>Skor: <span id="score-a">0</span></p>
+            <p>Peti: <span id="chest-a">0</span></p>
+          </div>
+        </div>
+        <div class="qa-space" id="qa-a">
+          <div class="qa-idle">Jelajahi peta dan temukan peti harta karun!</div>
+        </div>
+        <div class="joystick-area">
+          <div class="joystick-base" id="joy-base-a">
+            <div class="joystick-stick" id="joy-stick-a"></div>
+          </div>
+          <div class="kbd-hint">Keyboard: Panah (Arrows)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. RESULT SCREEN -->
+  <section id="result" class="screen">
+    <div class="panel-card" style="max-width: 800px; background: rgba(255,248,231,0.95);">
+      <h1 class="result-title" id="res-title">PERTANDINGAN SELESAI</h1>
+      <p id="res-reason" style="margin-bottom: 20px; font-weight:bold; color:#555;">Waktu Habis!</p>
+      
+      <div class="stats-container">
+        <div class="stat-card" id="stat-b">
+          <div class="stat-name" style="color:var(--player-b)">PLAYER B</div>
+          <div class="stat-row"><span>Skor</span><strong id="r-score-b">0</strong></div>
+          <div class="stat-row"><span>Peti Dibuka</span><strong id="r-chest-b">0</strong></div>
+          <div class="stat-row"><span>Benar / Salah</span><strong id="r-ans-b">0 / 0</strong></div>
+          <div class="stat-row"><span>Akurasi</span><strong id="r-acc-b">0%</strong></div>
+        </div>
+        <div class="stat-card" id="stat-a">
+          <div class="stat-name" style="color:var(--player-a)">PLAYER A</div>
+          <div class="stat-row"><span>Skor</span><strong id="r-score-a">0</strong></div>
+          <div class="stat-row"><span>Peti Dibuka</span><strong id="r-chest-a">0</strong></div>
+          <div class="stat-row"><span>Benar / Salah</span><strong id="r-ans-a">0 / 0</strong></div>
+          <div class="stat-row"><span>Akurasi</span><strong id="r-acc-a">0%</strong></div>
+        </div>
+      </div>
+      
+      <div class="home-buttons">
+        <button class="btn btn-outline" onclick="showScreen('home')">Ke Beranda</button>
+        <button class="btn btn-accent" onclick="showScreen('difficulty')">Main Lagi</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ==========================================================================
+   STATE AND CONFIGURATION
+   ========================================================================== */
+const MAP_SIZE = 9;
+const TOTAL_CHESTS = 20;
+const TIME_LIMIT = 180; // seconds
+
+let state = {
+  screen: 'home', slideIdx: 0, difficulty: 'mudah', timer: 0, interval: null, playing: false,
+  chestsOpened: 0,
+  players: {
+    A: { id: 'A', x: 8, y: 8, score: 0, chests: 0, correct: 0, wrong: 0, state: 'idle', activeChest: null, qId: null },
+    B: { id: 'B', x: 0, y: 0, score: 0, chests: 0, correct: 0, wrong: 0, state: 'idle', activeChest: null, qId: null }
+  },
+  chests: [], // {id, x, y, status: 'available'|'claimed'|'opened', claimer: null}
+  usedQuestions: []
+};
+
+// Input states
+const keys = { w:false, a:false, s:false, d:false, ArrowUp:false, ArrowLeft:false, ArrowDown:false, ArrowRight:false };
+let lastMoveTime = { A: 0, B: 0 };
+const MOVE_COOLDOWN = 180; // ms
+
+/* ==========================================================================
+   MATERIAL SLIDES
+   ========================================================================== */
+const slidesData = [
+  { title: "Apa yang Akan Kita Pelajari?", content: "<div style='text-align:center'><h3>Misi Adab Bertetangga</h3><br><p>Tujuan Belajar:</p></div><ul><li>Menjelaskan pentingnya menjaga hubungan baik dengan tetangga.</li><li>Mengidentifikasi contoh akhlak terpuji kepada tetangga Muslim dan non-Muslim.</li><li>Membedakan perilaku baik dan perilaku yang menyakiti tetangga.</li><li>Menentukan tindakan yang tepat saat ada perselisihan.</li><li>Menerapkan nilai keadilan dan saling menghormati dalam kehidupan.</li></ul>" },
+  { title: "Siapakah Tetangga Kita?", content: "<p>Tetangga adalah orang yang tempat tinggalnya berdekatan dengan kita.</p><br><div style='background:#fdf2e9; padding:15px; border-radius:10px;'><strong>Siapa saja mereka?</strong><ul><li>Keluarga di sebelah, depan, atau belakang rumah kita.</li><li>Warga di lingkungan RT/RW tempat kita tinggal.</li><li>Mereka bisa jadi memiliki agama, suku, atau kebiasaan yang berbeda dengan kita.</li></ul></div>" },
+  { title: "Islam Mengajarkan Kebaikan", content: "<p>Islam sangat menekankan pentingnya berbuat baik kepada tetangga.</p><br><ul><li><strong>QS. An-Nisa ayat 36:</strong> Allah memerintahkan kita berbuat baik kepada tetangga yang dekat maupun yang jauh.</li><li><strong>Hadis Nabi:</strong> <em>\"Barang siapa yang beriman kepada Allah dan hari akhir, maka hendaklah ia memuliakan tetangganya.\"</em> (HR. Bukhari & Muslim)</li></ul><p>Akhlak baik kepada tetangga adalah bukti keimanan seorang Muslim.</p>" },
+  { title: "Hak Tetangga yang Harus Dijaga", content: "<p>Setiap tetangga memiliki hak untuk:</p><ul><li>Mendapatkan keamanan dan tidak diganggu (misalnya dari suara bising).</li><li>Mendapatkan lingkungan yang bersih (tidak membuang sampah ke halamannya).</li><li>Dihormati privasi dan barang miliknya.</li><li>Mendapat bantuan saat mengalami musibah atau kesulitan.</li><li>Menerima perlakuan dan perkataan yang santun.</li></ul>" },
+  { title: "Akhlak kepada Tetangga Muslim", content: "<p>Contoh sikap terpuji kepada sesama Muslim:</p><ul><li>Mengucapkan salam dan menjalin silaturahmi.</li><li>Menjenguk ketika mereka sakit.</li><li>Berbagi makanan jika kita memiliki kelebihan.</li><li>Mendoakan kebaikan untuk mereka.</li><li>Saling mengingatkan dalam kebaikan dengan cara yang sopan.</li><li>Meminta maaf dengan ikhlas jika melakukan kesalahan.</li></ul>" },
+  { title: "Akhlak kepada Tetangga Non-Muslim", content: "<p>Perbedaan agama <strong>bukanlah alasan</strong> untuk berbuat buruk. Kita tetap harus:</p><ul><li>Menyapa dan berbicara dengan sopan santun.</li><li>Membantu urusan kemanusiaan ketika mereka tertimpa musibah.</li><li>Menjaga kebersihan dan keamanan lingkungan bersama.</li><li>Menghormati perbedaan keyakinan tanpa mengejeknya.</li><li>Tidak memaksakan ajaran agama kita kepada mereka.</li></ul>" },
+  { title: "Apa yang Sama dan Perlu Dihormati?", content: "<div style='display:flex; gap:10px; font-size:1rem;'><div style='flex:1; background:#e8f8f5; padding:10px; border-radius:8px;'><strong>Tetangga Muslim</strong><br>Saling mendoakan, silaturahmi erat, tolong-menolong, saling menghargai.</div><div style='flex:1; background:#fef9e7; padding:10px; border-radius:8px;'><strong>Tetangga Non-Muslim</strong><br>Santun, adil, peduli musibah, menghormati keyakinan berbeda.</div></div><br><p style='text-align:center; font-weight:bold;'>Persamaannya:</p><p style='text-align:center'>Sama-sama tidak boleh disakiti, berhak atas keamanan, perlu dihargai, dan diperlakukan dengan adil.</p>" },
+  { title: "Perilaku Terpuji vs Harus Dihindari", content: "<div style='display:flex; gap:10px; font-size:1rem;'><div style='flex:1; border:2px solid #2ecc71; padding:10px; border-radius:8px;'><strong>👍 Terpuji</strong><ul><li>Berbagi makanan</li><li>Menjaga kebersihan</li><li>Menjenguk yang sakit</li><li>Bicara sopan</li></ul></div><div style='flex:1; border:2px solid #e74c3c; padding:10px; border-radius:8px;'><strong>👎 Dihindari</strong><ul><li>Membunyikan TV sangat keras</li><li>Membuang sampah sembarangan</li><li>Mengejek agama lain</li><li>Mengambil barang tanpa izin</li></ul></div></div>" },
+  { title: "Contoh dalam Keseharian", content: "<ul><li><strong>Situasi:</strong> Bola masuk halaman tetangga.<br><strong>Tindakan:</strong> Ketuk pintu, minta maaf, dan minta izin mengambilnya. Jangan menerobos masuk.</li><li><strong>Situasi:</strong> Ada kegiatan agama berbeda di lingkungan.<br><strong>Tindakan:</strong> Tetap tenang, tidak ikut campur urusan ibadahnya, tapi tidak mengganggu atau mengejek.</li><li><strong>Situasi:</strong> Tetangga kesulitan angkat barang.<br><strong>Tindakan:</strong> Segera tawarkan bantuan semampu kita.</li></ul>" },
+  { title: "Jika Terjadi Perselisihan", content: "<p>Langkah penyelesaian masalah yang baik:</p><ol><li>Tenangkan diri, jangan langsung marah atau membalas.</li><li>Dengarkan penjelasan dari pihak tetangga.</li><li>Sampaikan masalah dengan bahasa yang sopan dan tidak membentak.</li><li>Berani meminta maaf jika kitalah yang bersalah.</li><li>Cari solusi bersama demi kerukunan.</li><li>Minta bantuan orang dewasa (RT/RW) jika sulit diselesaikan sendiri.</li></ol>" },
+  { title: "Menghormati Perbedaan dengan Tepat", content: "<p>Menghormati perbedaan keyakinan <strong>tidak berarti</strong> kita harus mengikuti keyakinan atau ibadah mereka.</p><br><p>Toleransi yang benar dalam Islam:</p><ul><li>Teguh pada aqidah dan ibadah sendiri.</li><li>Membiarkan tetangga beribadah sesuai agamanya tanpa diganggu.</li><li>Tetap bekerja sama dalam urusan dunia seperti gotong royong, ronda, dan kebersihan.</li><li>Berlaku adil dan tidak curang kepada mereka.</li></ul>" },
+  { title: "Ayo Analisis Situasi!", content: "<p>Coba pikirkan tindakan terbaik untuk kasus ini:</p><div style='font-size:1rem; background:#f4f6f6; padding:10px; margin-bottom:10px; border-left:4px solid var(--accent);'><strong>Kasus:</strong> Temanmu mengejek cara ibadah tetanggamu yang non-Muslim.</div><p><em>Jawaban:</em> Tegur temanmu dengan baik. Jelaskan bahwa Islam melarang kita menghina atau mengejek keyakinan orang lain, karena itu bisa menimbulkan permusuhan.</p>" },
+  { title: "Rangkuman", content: "<h3 style='text-align:center; color:var(--primary);'>Jadilah Tetangga yang Baik!</h3><br><ul><li>Selalu bersikap <strong>santun</strong> dan ramah.</li><li><strong>Bantu</strong> sesuai kemampuan.</li><li>Jaga <strong>keamanan</strong> dan <strong>kenyamanan</strong> bersama.</li><li><strong>Hormati</strong> perbedaan yang ada.</li><li>Berlaku <strong>adil</strong> tanpa pandang bulu.</li><li>Jauhi perilaku yang <strong>merugikan</strong> atau menyakiti hati tetangga.</li></ul><p style='text-align:center; margin-top:20px; font-weight:bold;'>Siap menguji pengetahuanmu? Lanjutkan ke Arena!</p>" }
+];
+
+/* ==========================================================================
+   QUESTION DATABASE (Exactly 60 questions, structured tightly)
+   M: Mudah, S: Sedang, H: Sulit | Type: tf, mc, ms
+   ========================================================================== */
+const db = {
+  mudah: [
+    { id:"m_tf1", type:"tf", q:"Tetangga adalah orang yang tempat tinggalnya berdekatan dengan rumah kita.", a:true, exp:"Tetangga adalah mereka yang rumahnya ada di sekitar kita." },
+    { id:"m_tf2", type:"tf", q:"Islam hanya menyuruh kita berbuat baik kepada tetangga yang beragama Islam saja.", a:false, exp:"Islam menyuruh berbuat baik kepada semua tetangga, baik Muslim maupun non-Muslim." },
+    { id:"m_tf3", type:"tf", q:"Kita boleh menyalakan radio keras-keras di malam hari karena itu rumah kita sendiri.", a:false, exp:"Tetangga berhak mendapat ketenangan dan tidak boleh diganggu." },
+    { id:"m_tf4", type:"tf", q:"Membuang sampah di halaman kosong milik tetangga adalah perbuatan yang dilarang.", a:true, exp:"Menjaga kebersihan lingkungan adalah hak bersama." },
+    { id:"m_tf5", type:"tf", q:"Menyapa dengan senyum saat bertemu tetangga merupakan contoh akhlak terpuji.", a:true, exp:"Senyum dan sapaan yang baik mempererat silaturahmi." },
+    { id:"m_tf6", type:"tf", q:"Jika tetangga berbeda agama sedang sakit, kita tidak perlu peduli.", a:false, exp:"Menjenguk atau peduli kepada tetangga sakit adalah adab yang baik tanpa membedakan agama." },
+    { id:"m_tf7", type:"tf", q:"Menghormati tetangga adalah bagian dari tanda kesempurnaan iman seseorang.", a:true, exp:"Nabi bersabda bahwa memuliakan tetangga adalah tanda iman kepada Allah." },
+    { id:"m_mc1", type:"mc", q:"Apa yang dimaksud dengan tetangga?", opt:["Hanya keluarga kandung","Orang yang tinggal berdekatan dengan kita","Teman satu sekolah","Orang yang jauh di kota lain"], a:1, exp:"Tetangga mencakup siapa saja yang tinggal di dekat rumah kita." },
+    { id:"m_mc2", type:"mc", q:"Tindakan mana yang menunjukkan adab baik kepada tetangga?", opt:["Membuang sampah ke selokannya","Mengambil mangganya tanpa izin","Berbagi makanan jika ada rezeki lebih","Mengejek nama orang tuanya"], a:2, exp:"Berbagi makanan adalah sunnah dan membahagiakan tetangga." },
+    { id:"m_mc3", type:"mc", q:"Jika tetangga kita non-Muslim, sikap kita seharusnya...", opt:["Memusuhi mereka","Berlaku sopan dan adil","Memaksa masuk Islam","Menjauhi mereka sepenuhnya"], a:1, exp:"Kita harus hidup rukun, sopan, dan adil kepada semua tetangga." },
+    { id:"m_mc4", type:"mc", q:"Manakah yang merupakan hak tetangga atas diri kita?", opt:["Hak untuk diganggu","Hak untuk keamanan dan ketenangan","Hak untuk diejek","Hak untuk dibiarkan kelaparan"], a:1, exp:"Tetangga berhak merasa aman dan tenang dari gangguan kita." },
+    { id:"m_mc5", type:"mc", q:"Saat bermain bersama anak tetangga, kita sebaiknya...", opt:["Bermain curang agar menang","Bermain rukun dan tidak berkelahi","Merebut mainannya","Membuat keributan"], a:1, exp:"Rukun dalam bermain adalah cerminan akhlak anak Muslim." },
+    { id:"m_mc6", type:"mc", q:"Apa bahayanya jika kita suka menyakiti tetangga?", opt:["Dibenci Allah dan manusia","Mendapat hadiah","Menjadi populer","Lingkungan jadi aman"], a:0, exp:"Menyakiti tetangga dilarang agama dan merusak kerukunan sosial." },
+    { id:"m_mc7", type:"mc", q:"Kalimat yang paling baik diucapkan saat bertemu tetangga Muslim adalah...", opt:["Hai bro!","Assalamualaikum","Permisi numpang lewat","Apa lihat-lihat?"], a:1, exp:"Mengucapkan salam adalah doa dan adab terbaik antar Muslim." },
+    { id:"m_ms1", type:"ms", q:"Pilih 2 sikap yang BENAR terhadap tetangga beda agama:", opt:["Menghormati haknya","Mengikuti ibadahnya","Berbuat adil kepadanya"], a:[0,2], exp:"Kita harus adil dan menghormati haknya, tanpa harus mengikuti ibadahnya." },
+    { id:"m_ms2", type:"ms", q:"Pilih 2 perbuatan yang HARUS dihindari dalam bertetangga:", opt:["Membantu mengangkat barang","Membuang sampah sembarangan","Menyalakan musik sangat keras"], a:[1,2], exp:"Membuang sampah dan suara bising merugikan kenyamanan tetangga." },
+    { id:"m_ms3", type:"ms", q:"Pilih 2 hak tetangga yang perlu dipenuhi:", opt:["Mendapat gangguan","Mendapat perlakuan santun","Mendapat rasa aman"], a:[1,2], exp:"Santun dan rasa aman adalah hak dasar setiap tetangga." },
+    { id:"m_ms4", type:"ms", q:"Pilih 2 cara menjaga kerukunan lingkungan:", opt:["Kerja bakti bersama","Saling menggunjing","Menjaga fasilitas umum"], a:[0,2], exp:"Kerja bakti dan menjaga fasilitas mempererat hubungan warga." },
+    { id:"m_ms5", type:"ms", q:"Pilih 2 tindakan saat tetangga mengalami musibah:", opt:["Menertawakannya","Memberi bantuan semampu kita","Mendoakan kebaikannya"], a:[1,2], exp:"Bantuan dan doa adalah bentuk kepedulian sejati." },
+    { id:"m_ms6", type:"ms", q:"Pilih 2 sikap saat lewat di depan tetangga yang sedang duduk:", opt:["Menyapa dengan senyum","Berlari sambil berteriak","Membungkuk sedikit atau permisi"], a:[0,2], exp:"Senyum dan permisi adalah adab sopan santun ketimuran dan Islami." }
+  ],
+  sedang: [
+    { id:"s_tf1", type:"tf", q:"Jika bola kita masuk ke halaman tetangga, kita boleh memanjat pagarnya untuk mengambil sendiri.", a:false, exp:"Kita harus mengetuk pintu dan meminta izin terlebih dahulu." },
+    { id:"s_tf2", type:"tf", q:"Kita boleh menegur tetangga yang membuang sampah sembarangan dengan cara yang sopan.", a:true, exp:"Mengingatkan dalam kebaikan harus dilakukan dengan cara yang tidak menyakiti." },
+    { id:"s_tf3", type:"tf", q:"Jika tetangga merayakan hari besar agamanya, kita wajib ikut merayakannya agar disebut toleran.", a:false, exp:"Toleransi berarti membiarkan tanpa mengganggu, bukan ikut merayakan." },
+    { id:"s_tf4", type:"tf", q:"Saat ada konflik kecil dengan anak tetangga, kita sebaiknya langsung membalas memukul.", a:false, exp:"Menahan amarah dan menyelesaikan dengan damai adalah akhlak yang benar." },
+    { id:"s_tf5", type:"tf", q:"Walaupun tetangga kita pernah berbuat salah, jika dia butuh bantuan mendesak, kita sebaiknya menolongnya.", a:true, exp:"Memaafkan dan menolong dalam kesulitan adalah akhlak mulia." },
+    { id:"s_tf6", type:"tf", q:"Kita tidak perlu berbuat baik kepada tetangga yang tidak pernah menyapa kita.", a:false, exp:"Kita tetap harus berbuat baik karena itu perintah Allah, bukan hanya balasan." },
+    { id:"s_tf7", type:"tf", q:"Menghormati perbedaan berarti kita tidak mengejek keyakinan atau cara ibadah tetangga kita.", a:true, exp:"Mengejek keyakinan orang lain dilarang dan dapat memicu perpecahan." },
+    { id:"s_mc1", type:"mc", q:"Tetangga sedang sakit, tetapi agamanya berbeda dengan kita. Sikap terbaik adalah...", opt:["Membiarkan karena beda agama","Menjenguk atau mendoakan kesembuhannya","Bersyukur dia sakit","Mengasingkannya dari lingkungan"], a:1, exp:"Menjenguk dan mendoakan kesembuhan adalah bentuk peduli kemanusiaan." },
+    { id:"s_mc2", type:"mc", q:"Suara televisimu mengganggu tetangga yang sedang belajar. Apa yang harus dilakukan?", opt:["Mengecilkan volumenya","Memarahi tetangga karena ikut campur","Membesarkan volume","Menutup pintu rumah tetangga"], a:0, exp:"Kenyamanan tetangga tidak boleh dikorbankan demi hiburan kita sendiri." },
+    { id:"s_mc3", type:"mc", q:"Kamu tidak sengaja memecahkan pot tanaman tetangga. Tindakan yang tepat adalah...", opt:["Lari sembunyi","Menyalahkan kucing","Mengaku, minta maaf, dan mengganti jika mampu","Pura-pura tidak tahu"], a:2, exp:"Berani bertanggung jawab adalah ciri anak yang berakhlak baik." },
+    { id:"s_mc4", type:"mc", q:"Temanmu mengejek simbol agama tetanggamu. Apa yang sebaiknya kamu lakukan?", opt:["Ikut mengejek","Merekam dan menyebarkannya","Menegur temanmu bahwa itu perbuatan salah","Pura-pura tidak dengar"], a:2, exp:"Mengingatkan teman agar tidak menghina agama lain adalah kewajiban." },
+    { id:"s_mc5", type:"mc", q:"Jika tetangga meminjam barang kita, sikap yang baik adalah...", opt:["Meminjamkan dengan ikhlas jika barangnya ada","Meminta bayaran mahal","Mengejeknya karena tidak punya","Meminjamkan tapi sambil marah-marah"], a:0, exp:"Meminjamkan barang yang dibutuhkan adalah sedekah." },
+    { id:"s_mc6", type:"mc", q:"Bagaimana cara menjaga privasi tetangga?", opt:["Mengintip ke dalam rumahnya","Menyebarkan rahasia keluarganya","Tidak sembarangan masuk tanpa izin","Mendengarkan pembicaraannya dari dinding"], a:2, exp:"Meminta izin sebelum masuk adalah ajaran dasar Islam." },
+    { id:"s_mc7", type:"mc", q:"Toleransi yang diajarkan Islam terhadap tetangga non-Muslim dalam hal sosial adalah...", opt:["Ikut ibadahnya","Tolong-menolong dalam kebaikan dan urusan warga","Menghina ajarannya","Memutus komunikasi"], a:1, exp:"Islam membolehkan kerja sama dalam muamalah dan kebaikan sosial." },
+    { id:"s_ms1", type:"ms", q:"Pilih 2 sikap santun saat berkomunikasi dengan tetangga:", opt:["Berteriak dari jauh","Menggunakan kata-kata yang baik","Mendengarkan saat ia berbicara"], a:[1,2], exp:"Kata-kata baik dan mendengarkan adalah bentuk penghargaan." },
+    { id:"s_ms2", type:"ms", q:"Pilih 2 cara menyelesaikan masalah jika terjadi kesalahpahaman:", opt:["Berbicara dengan kepala dingin","Meminta maaf jika ada kelalaian","Membuat gosip di lingkungan"], a:[0,1], exp:"Kepala dingin dan maaf adalah kunci perdamaian." },
+    { id:"s_ms3", type:"ms", q:"Pilih 2 contoh membantu tetangga sesuai kemampuan:", opt:["Mengerjakan semua PR sekolahnya","Membantu membawakan belanjaan berat","Membantu membersihkan parit rumahnya bersama"], a:[1,2], exp:"Bantuan fisik yang ringan sangat berarti bagi tetangga." },
+    { id:"s_ms4", type:"ms", q:"Pilih 2 hak bertetangga yang sering dilanggar tanpa sadar:", opt:["Memarkir kendaraan menutupi jalan orang lain","Memberi senyuman","Membakar sampah yang asapnya masuk ke rumah tetangga"], a:[0,2], exp:"Parkir sembarangan dan asap mengganggu hak orang lain." },
+    { id:"s_ms5", type:"ms", q:"Pilih 2 tindakan yang BENAR ketika tetangga punya acara:", opt:["Menjaga ketertiban agar tidak merusak acaranya","Sengaja membuat keributan tandingan","Menghormati tamu-tamu yang datang"], a:[0,2], exp:"Menghormati acara tetangga menunjukkan kita tetangga yang baik." },
+    { id:"s_ms6", type:"ms", q:"Pilih 2 batasan toleransi dengan tetangga beda agama:", opt:["Tidak ikut campur urusan peribadatan mereka","Tetap berbuat adil dalam urusan sosial","Mengikuti ritual keagamaan mereka"], a:[0,1], exp:"Toleransi berlaku pada batas sosial, bukan pencampuran ritual." }
+  ],
+  sulit: [
+    { id:"h_tf1", type:"tf", q:"Jika tetangga sering berbuat kasar, kita diperbolehkan membalasnya dengan kekasaran yang sama agar dia jera.", a:false, exp:"Membalas dengan keburukan bukan solusi; sebaiknya dilaporkan ke pihak berwenang (RT) atau dinasihati." },
+    { id:"h_tf2", type:"tf", q:"Bersikap adil kepada tetangga non-Muslim berarti kita tidak boleh menipu mereka dalam jual beli.", a:true, exp:"Keadilan dalam Islam berlaku untuk semua manusia tanpa membedakan agama." },
+    { id:"h_tf3", type:"tf", q:"Jika ada dua tetangga yang berselisih, tugas kita adalah memihak kepada yang seagama dengan kita meskipun dia salah.", a:false, exp:"Kita harus memihak pada kebenaran dan keadilan, bukan kesamaan agama/golongan." },
+    { id:"h_tf4", type:"tf", q:"Menghormati keyakinan tetangga berarti kita membenarkan semua ajaran agamanya dalam hati kita.", a:false, exp:"Menghormati berarti menghargai haknya untuk meyakini, bukan berarti kita ikut membenarkannya." },
+    { id:"h_tf5", type:"tf", q:"Meskipun berbeda agama, tetangga tetap memiliki hak syuf'ah (prioritas jika kita menjual tanah/rumah) menurut sebagian ulama.", a:true, exp:"Tetangga dekat memiliki prioritas penawaran karena terhubungnya properti." },
+    { id:"h_tf6", type:"tf", q:"Menyebarkan kekurangan dan aib tetangga diperbolehkan asalkan beritanya memang benar terjadi.", a:false, exp:"Menyebarkan aib yang benar disebut ghibah, dan itu dilarang keras." },
+    { id:"h_tf7", type:"tf", q:"Memberikan hadiah kepada tetangga non-Muslim diperbolehkan untuk menjaga hubungan sosial yang baik.", a:true, exp:"Memberi hadiah untuk tujuan sosial dan kerukunan diperbolehkan dalam Islam." },
+    { id:"h_mc1", type:"mc", q:"Tetanggamu sering membuang sampah ke pekaranganmu. Tindakan paling bijak yang sesuai akhlak Islam adalah...", opt:["Membuang balik sampah itu ke rumahnya","Menegur dengan sopan dan memberi solusi letak tempat sampah","Memusuhinya dan menceritakannya ke semua orang","Melaporkannya ke polisi tanpa bicara dulu"], a:1, exp:"Komunikasi yang baik adalah langkah pertama mencegah konflik." },
+    { id:"h_mc2", type:"mc", q:"Ada sumbangan untuk warga yang terkena bencana. Beberapa korban adalah non-Muslim. Apa yang harus kamu lakukan?", opt:["Hanya menyumbang untuk yang Muslim","Turut menyumbang untuk semua karena ini urusan kemanusiaan","Melarang panitia memberikan kepada non-Muslim","Menarik kembali sumbangan"], a:1, exp:"Dalam urusan musibah kemanusiaan, Islam mengajarkan rahmat bagi semua." },
+    { id:"h_mc3", type:"mc", q:"Jika kamu mengetahui tetanggamu sedang kelaparan, sedangkan kamu memiliki makanan berlebih, hukum membantunya adalah...", opt:["Sunnah","Wajib","Makruh","Mubah"], a:1, exp:"Nabi bersabda tidak beriman seseorang yang tidur kenyang sementara tetangganya lapar." },
+    { id:"h_mc4", type:"mc", q:"Anto berbeda keyakinan dengan Budi. Budi merayakan hari raya agamanya. Tindakan Anto yang mencerminkan batas toleransi adalah...", opt:["Ikut ritual sembahyang Budi","Membantu kelancaran acara agar aman tanpa ikut ritualnya","Menghancurkan tempat ibadah Budi","Memutus tali pertemanan"], a:1, exp:"Menjaga keamanan dan ketertiban adalah wujud toleransi yang benar." },
+    { id:"h_mc5", type:"mc", q:"Bagaimana sikap kita jika tetangga melakukan perbuatan maksiat di rumahnya sendiri?", opt:["Membakar rumahnya","Menasihati secara rahasia dan hikmah, atau lapor pihak berwenang","Menyebarluaskan aibnya di media sosial","Ikut bergabung dengannya"], a:1, exp:"Nasihat harus dengan cara yang baik, rahasia, atau diserahkan pada pihak berwenang (RT)." },
+    { id:"h_mc6", type:"mc", q:"Makna dari hadis 'Barangsiapa beriman kepada Allah dan hari akhir, janganlah menyakiti tetangganya' menunjukkan bahwa...", opt:["Menyakiti tetangga dapat merusak nilai keimanan","Tetangga tidak bisa disakiti","Hanya orang beriman yang punya tetangga","Keimanan diukur dari jumlah tetangga"], a:0, exp:"Kualitas iman seseorang sangat berkaitan dengan cara ia memperlakukan tetangganya." },
+    { id:"h_mc7", type:"mc", q:"Jika kepentinganku berbenturan dengan kepentingan tetangga (misal: aku ingin renovasi berisik), langkah terbaik adalah...", opt:["Lakukan saja karena ini tanahku","Meminta izin, mencari waktu yang tepat, dan meminimalkan gangguan","Menyuruh tetangga pindah sementara","Memaksa tetangga untuk maklum"], a:1, exp:"Minta izin dan komunikasi mencegah rasa sakit hati tetangga." },
+    { id:"h_ms1", type:"ms", q:"Pilih 2 sikap yang tepat ketika mencoba mendamaikan dua tetangga yang bertikai:", opt:["Tidak berpihak secara membabi buta (adil)","Menghasut salah satu pihak","Mendengarkan keterangan dari kedua belah pihak"], a:[0,2], exp:"Keadilan dan mendengar semua pihak adalah syarat mendamaikan." },
+    { id:"h_ms2", type:"ms", q:"Pilih 2 batasan dalam berhubungan dengan tetangga beda agama:", opt:["Boleh bermuamalah (jual beli, tolong menolong)","Boleh mencampuradukkan ibadah","Tidak boleh memaksa mereka memeluk Islam"], a:[0,2], exp:"Muamalah dibolehkan, pemaksaan dan campur ibadah dilarang." },
+    { id:"h_ms3", type:"ms", q:"Pilih 2 tindakan yang harus dihindari saat membangun/merenovasi rumah:", opt:["Membuat struktur yang membahayakan rumah tetangga","Meminta izin dan pengertian tetangga","Menutup akses jalan umum atau selokan tanpa izin"], a:[0,2], exp:"Membahayakan orang lain dan menutup fasilitas umum itu zalim." },
+    { id:"h_ms4", type:"ms", q:"Pilih 2 hal yang menunjukkan keadilan terhadap tetangga non-Muslim:", opt:["Membela mereka jika mereka didzalimi","Mengurangi timbangan saat berjualan kepada mereka","Menjaga keamanan harta benda mereka saat mereka pergi"], a:[0,2], exp:"Keadilan berarti melindungi hak mereka dan tidak berbuat curang." },
+    { id:"h_ms5", type:"ms", q:"Pilih 2 cara memperbaiki hubungan dengan tetangga setelah berkonflik:", opt:["Segera meminta maaf jika sadar bersalah","Menyimpan dendam di dalam hati","Saling bertegur sapa kembali secara normal"], a:[0,2], exp:"Maaf dan tegur sapa menghancurkan ego dan memperbaiki hubungan." },
+    { id:"h_ms6", type:"ms", q:"Pilih 2 nilai utama dalam menyelesaikan masalah antar tetangga:", opt:["Keadilan (bersikap objektif)","Kedengkian (mencari kesalahan)","Musyawarah (mencari jalan keluar bersama)"], a:[0,2], exp:"Adil dan musyawarah adalah fondasi sosial Islami." }
+  ]
+};
+
+/* ==========================================================================
+   GAME ENGINE & CORE LOGIC
+   ========================================================================== */
+function getEle(id) { return document.getElementById(id); }
+
+// UI Initialization
+function init() {
+  renderSlides();
+  showScreen('home');
+  setupKeyboard();
+  setupJoysticks();
+  generateParticles();
+}
+
+function showScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  getEle(screenId).classList.add('active');
+  state.screen = screenId;
+  
+  if (screenId === 'materi') { state.slideIdx = 0; updateSlideUI(); }
+  if (screenId === 'home' || screenId === 'difficulty') {
+    if(state.playing) resetGame();
+  }
+}
+
+// Particle Background
+function generateParticles() {
+  const container = getEle('particles');
+  container.innerHTML = '';
+  for(let i=0; i<30; i++) {
+    const p = document.createElement('div');
+    p.style.position = 'absolute';
+    p.style.width = Math.random() * 4 + 2 + 'px';
+    p.style.height = p.style.width;
+    p.style.background = 'rgba(241, 196, 15, 0.4)';
+    p.style.borderRadius = '50%';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top = Math.random() * 100 + 'vh';
+    p.style.animation = `floatTitle ${Math.random() * 3 + 2}s infinite alternate`;
+    container.appendChild(p);
+  }
+}
+
+/* --- MATERIAL SLIDES --- */
+function renderSlides() {
+  const c = getEle('slide-content');
+  const dots = getEle('slide-dots');
+  c.innerHTML = ''; dots.innerHTML = '';
+  slidesData.forEach((s, i) => {
+    c.innerHTML += `<div class="slide-card ${i===0?'active':''}" id="slide-${i}">
+      <h2 class="slide-title">${s.title}</h2>
+      <div class="slide-body">${s.content}</div>
+    </div>`;
+    dots.innerHTML += `<div class="dot ${i===0?'active':''}" onclick="goToSlide(${i})"></div>`;
+  });
+}
+
+function updateSlideUI() {
+  document.querySelectorAll('.slide-card').forEach((s, i) => {
+    s.classList.toggle('active', i === state.slideIdx);
+  });
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i === state.slideIdx);
+  });
+  getEle('btn-prev').style.visibility = state.slideIdx === 0 ? 'hidden' : 'visible';
+  if (state.slideIdx === slidesData.length - 1) {
+    getEle('btn-next').style.display = 'none';
+    getEle('btn-mulai-materi').style.display = 'block';
+  } else {
+    getEle('btn-next').style.display = 'block';
+    getEle('btn-mulai-materi').style.display = 'none';
+  }
+}
+function nextSlide() { if(state.slideIdx < slidesData.length-1) { state.slideIdx++; updateSlideUI(); } }
+function prevSlide() { if(state.slideIdx > 0) { state.slideIdx--; updateSlideUI(); } }
+function goToSlide(i) { state.slideIdx = i; updateSlideUI(); }
+
+/* --- GAME SETUP --- */
+function startGame(diff) {
+  state.difficulty = diff;
+  resetGame();
+  
+  // Setup Bank
+  const diffMap = { mudah: db.mudah, sedang: db.sedang, sulit: db.sulit };
+  state.usedQuestions = [...diffMap[diff]].sort(() => Math.random() - 0.5); // Shuffle
+  
+  // Setup Map & Entities
+  initMap();
+  updatePlayerUI();
+  getEle('ui-diff-label').innerText = diff.toUpperCase();
+  showScreen('arena');
+  
+  state.playing = true;
+  state.timer = TIME_LIMIT;
+  updateTimerUI();
+  state.interval = setInterval(gameLoop, 1000);
+}
+
+function resetGame() {
+  clearInterval(state.interval);
+  state.playing = false;
+  state.chestsOpened = 0;
+  state.players.A = { id: 'A', x: 8, y: 8, score: 0, chests: 0, correct: 0, wrong: 0, state: 'idle', activeChest: null, qId: null };
+  state.players.B = { id: 'B', x: 0, y: 0, score: 0, chests: 0, correct: 0, wrong: 0, state: 'idle', activeChest: null, qId: null };
+  state.chests = [];
+  getEle('qa-a').innerHTML = '<div class="qa-idle">Jelajahi peta dan temukan peti harta karun!</div>';
+  getEle('qa-b').innerHTML = '<div class="qa-idle">Jelajahi peta dan temukan peti harta karun!</div>';
+  resetJoystick('a'); resetJoystick('b');
+}
+
+function confirmExit() {
+  if(confirm('Yakin ingin keluar? Permainan saat ini akan dibatalkan.')) {
+    showScreen('home');
+  }
+}
+
+/* --- MAP & ENTITIES --- */
+function initMap() {
+  const grid = getEle('map-grid');
+  // Clear old map cells (keep avatars)
+  Array.from(grid.children).forEach(c => {
+    if(!c.classList.contains('avatar-entity')) c.remove();
+  });
+  
+  // Create Cells (visual only)
+  for(let i=0; i<MAP_SIZE * MAP_SIZE; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'grid-cell';
+    grid.appendChild(cell);
+  }
+  
+  // Spawn Chests
+  let availableSpots = [];
+  for(let x=0; x<MAP_SIZE; x++){
+    for(let y=0; y<MAP_SIZE; y++){
+      if((x===0 && y===0) || (x===8 && y===8)) continue; // Avatars start pos
+      availableSpots.push({x, y});
+    }
+  }
+  availableSpots.sort(() => Math.random() - 0.5);
+  
+  for(let i=0; i<TOTAL_CHESTS; i++) {
+    const spot = availableSpots[i];
+    const chest = { id: `c_${i}`, x: spot.x, y: spot.y, status: 'available', claimer: null };
+    state.chests.push(chest);
+    
+    const el = document.createElement('div');
+    el.id = chest.id;
+    el.className = 'entity chest-entity available';
+    el.innerHTML = `<svg class="chest-svg" viewBox="0 0 100 100"><path d="M10,40 L90,40 L85,85 L15,85 Z" fill="#D4AF37" stroke="#8C6E15" stroke-width="3"/><path d="M10,40 C10,15 90,15 90,40 Z" fill="#F1C40F" stroke="#8C6E15" stroke-width="3"/><rect x="42" y="32" width="16" height="16" rx="3" fill="#8C6E15"/><circle cx="50" cy="40" r="4" fill="#333"/><path d="M48,40 L48,46 L52,46 L52,40 Z" fill="#333"/><path d="M15,60 L85,60" stroke="#8C6E15" stroke-width="2"/></svg><div class="lock-icon">🔒</div>`;
+    grid.appendChild(el);
+    updateEntityPos(el, chest.x, chest.y);
+  }
+  
+  // Init Avatars
+  grid.appendChild(getEle('avatar-b')); // re-append to keep z-index order
+  grid.appendChild(getEle('avatar-a'));
+  updateEntityPos(getEle('avatar-a'), state.players.A.x, state.players.A.y);
+  updateEntityPos(getEle('avatar-b'), state.players.B.x, state.players.B.y);
+  updateChestCounter();
+}
+
+function updateEntityPos(el, x, y) {
+  el.style.left = `${(x / MAP_SIZE) * 100}%`;
+  el.style.top = `${(y / MAP_SIZE) * 100}%`;
+}
+
+/* --- MOVEMENT & INPUT --- */
+function setupKeyboard() {
+  window.addEventListener('keydown', (e) => {
+    if(state.screen === 'materi') {
+      if(e.key === 'ArrowRight') nextSlide();
+      if(e.key === 'ArrowLeft') prevSlide();
+    }
+    if(!state.playing) return;
+    if(keys.hasOwnProperty(e.key)) keys[e.key] = true;
+    processMovement();
+  });
+  window.addEventListener('keyup', (e) => {
+    if(keys.hasOwnProperty(e.key)) keys[e.key] = false;
+  });
+}
+
+function setupJoysticks() {
+  ['a', 'b'].forEach(pid => {
+    const base = getEle(`joy-base-${pid}`);
+    const stick = getEle(`joy-stick-${pid}`);
+    let active = false, origin = {x:0, y:0};
+    
+    const handleMove = (x, y) => {
+      if(!active || !state.playing) return;
+      const dx = x - origin.x; const dy = y - origin.y;
+      const mag = Math.sqrt(dx*dx + dy*dy);
+      const maxR = 35;
+      
+      const pIdUpper = pid.toUpperCase();
+      
+      if(mag > 15) {
+        // Trigger directional move
+        let moveX = 0, moveY = 0;
+        if(Math.abs(dx) > Math.abs(dy)) moveX = dx > 0 ? 1 : -1;
+        else moveY = dy > 0 ? 1 : -1;
+        
+        attemptMove(state.players[pIdUpper], moveX, moveY);
+      }
+      
+      const nx = mag > maxR ? (dx/mag)*maxR : dx;
+      const ny = mag > maxR ? (dy/mag)*maxR : dy;
+      stick.style.transform = `translate(${nx}px, ${ny}px)`;
+    };
+    
+    base.addEventListener('pointerdown', (e) => {
+      active = true;
+      const rect = base.getBoundingClientRect();
+      origin = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
+      handleMove(e.clientX, e.clientY);
+      base.setPointerCapture(e.pointerId);
+    });
+    base.addEventListener('pointermove', (e) => handleMove(e.clientX, e.clientY));
+    const end = (e) => { active = false; resetJoystick(pid); base.releasePointerCapture(e.pointerId); };
+    base.addEventListener('pointerup', end);
+    base.addEventListener('pointercancel', end);
+  });
+}
+
+function resetJoystick(pid) {
+  const stick = getEle(`joy-stick-${pid}`);
+  if(stick) stick.style.transform = `translate(0px, 0px)`;
+}
+
+function processMovement() {
+  const now = Date.now();
+  // Player B (WASD)
+  if(now - lastMoveTime.B > MOVE_COOLDOWN) {
+    let dx=0, dy=0;
+    if(keys.w) dy = -1; else if(keys.s) dy = 1; else if(keys.a) dx = -1; else if(keys.d) dx = 1;
+    if(dx!==0 || dy!==0) attemptMove(state.players.B, dx, dy);
+  }
+  // Player A (Arrows)
+  if(now - lastMoveTime.A > MOVE_COOLDOWN) {
+    let dx=0, dy=0;
+    if(keys.ArrowUp) dy = -1; else if(keys.ArrowDown) dy = 1; else if(keys.ArrowLeft) dx = -1; else if(keys.ArrowRight) dx = 1;
+    if(dx!==0 || dy!==0) attemptMove(state.players.A, dx, dy);
+  }
+}
+
+function attemptMove(player, dx, dy) {
+  if(player.state !== 'idle' || !state.playing) return;
+  const nx = player.x + dx;
+  const ny = player.y + dy;
+  if(nx < 0 || nx >= MAP_SIZE || ny < 0 || ny >= MAP_SIZE) return; // Bounds
+  
+  // Note: we allow avatars to overlap physically, but handle chest logic
+  player.x = nx; player.y = ny;
+  lastMoveTime[player.id] = Date.now();
+  updateEntityPos(getEle(`avatar-${player.id.toLowerCase()}`), nx, ny);
+  
+  checkCollision(player);
+}
+
+function checkCollision(player) {
+  const chest = state.chests.find(c => c.x === player.x && c.y === player.y);
+  if(!chest) return;
+  
+  if(chest.status === 'available') {
+    chest.status = 'claimed';
+    chest.claimer = player.id;
+    player.state = 'answering';
+    player.activeChest = chest.id;
+    
+    // Update visual
+    const cel = getEle(chest.id);
+    cel.className = `entity chest-entity claimed-${player.id.toLowerCase()}`;
+    
+    // Assign Question
+    if(state.usedQuestions.length === 0) {
+      // reshuffle if run out (unlikely but safe)
+      const diffMap = { mudah: db.mudah, sedang: db.sedang, sulit: db.sulit };
+      state.usedQuestions = [...diffMap[state.difficulty]].sort(() => Math.random() - 0.5);
+    }
+    const q = state.usedQuestions.pop();
+    player.qId = q; // store object ref
+    
+    renderQuestion(player, q);
+  }
+}
+
+/* --- QUESTION ENGINE --- */
+function renderQuestion(player, q) {
+  const pid = player.id.toLowerCase();
+  const panel = getEle(`qa-${pid}`);
+  let html = `<div class="question-text">${q.q}</div>`;
+  
+  if(q.type === 'tf') {
+    html += `<div class="options-grid">
+      <button class="opt-btn" onclick="selectOpt('${player.id}', true, this)">BENAR</button>
+      <button class="opt-btn" onclick="selectOpt('${player.id}', false, this)">SALAH</button>
+    </div>`;
+  } else if(q.type === 'mc') {
+    html += `<div class="options-grid">`;
+    q.opt.forEach((o, i) => {
+      html += `<button class="opt-btn" onclick="selectOpt('${player.id}', ${i}, this)">${o}</button>`;
+    });
+    html += `</div>`;
+  } else if(q.type === 'ms') {
+    html += `<p style="font-size:0.8rem; color:var(--danger); margin-bottom:5px;">* Pilih tepat 2 jawaban</p><div class="options-grid">`;
+    q.opt.forEach((o, i) => {
+      html += `<button class="opt-btn ms-opt" onclick="toggleMultiOpt('${player.id}', ${i}, this)">${o}</button>`;
+    });
+    html += `</div><button class="submit-ans" id="btn-sub-${pid}" onclick="submitMulti('${player.id}')" disabled>Konfirmasi Jawaban</button>`;
+  }
+  
+  html += `<div class="feedback-box" id="fb-${pid}"></div>`;
+  panel.innerHTML = html;
+}
+
+// Global scope selections for players
+const selections = { A: [], B: [] };
+
+function selectOpt(pId, val, btn) {
+  if(!state.playing || state.players[pId].state !== 'answering') return;
+  const pIdLow = pId.toLowerCase();
+  document.querySelectorAll(`#qa-${pIdLow} .opt-btn`).forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  resolveAnswer(pId, [val]);
+}
+
+function toggleMultiOpt(pId, val, btn) {
+  if(!state.playing || state.players[pId].state !== 'answering') return;
+  const pIdLow = pId.toLowerCase();
+  if(btn.classList.contains('selected')) {
+    btn.classList.remove('selected');
+    selections[pId] = selections[pId].filter(v => v !== val);
+  } else {
+    if(selections[pId].length >= 2) return; // Max 2
+    btn.classList.add('selected');
+    selections[pId].push(val);
+  }
+  const subBtn = getEle(`btn-sub-${pIdLow}`);
+  if(subBtn) subBtn.disabled = selections[pId].length !== 2;
+}
+
+function submitMulti(pId) {
+  if(!state.playing || state.players[pId].state !== 'answering') return;
+  if(selections[pId].length === 2) {
+    resolveAnswer(pId, selections[pId]);
+    selections[pId] = []; // reset
+    getEle(`btn-sub-${pId.toLowerCase()}`).style.display = 'none';
+  }
+}
+
+function resolveAnswer(pId, ansArr) {
+  const p = state.players[pId];
+  if(p.state !== 'answering') return; // Prevent double trigger
+  p.state = 'resolving'; // lock temporarily
+  
+  const q = p.qId;
+  let isCorrect = false;
+  
+  if(q.type === 'tf' || q.type === 'mc') {
+    isCorrect = (ansArr[0] === q.a);
+  } else if(q.type === 'ms') {
+    // Check if both selected are in q.a
+    isCorrect = ansArr.length === 2 && ansArr.every(v => q.a.includes(v));
+  }
+  
+  const fb = getEle(`fb-${pId.toLowerCase()}`);
+  const btns = document.querySelectorAll(`#qa-${pId.toLowerCase()} .opt-btn`);
+  
+  // Highlight correct/wrong
+  if(q.type === 'tf' || q.type === 'mc') {
+     btns.forEach(b => {
+       if(b.classList.contains('selected')) b.classList.add(isCorrect ? 'correct' : 'wrong');
+     });
+  } else {
+     btns.forEach(b => {
+       if(b.classList.contains('selected')) {
+         const idx = Array.from(btns).indexOf(b);
+         if(q.a.includes(idx)) b.classList.add('correct');
+         else b.classList.add('wrong');
+       }
+     });
+  }
+
+  fb.innerHTML = `<div>${isCorrect ? 'BENAR! Harta Karun Terbuka!' : 'BELUM TEPAT!'}</div><div style="font-weight:normal; margin-top:5px;">${q.exp}</div>`;
+  fb.className = `feedback-box show ${isCorrect ? 'correct' : 'wrong'}`;
+  
+  const chest = state.chests.find(c => c.id === p.activeChest);
+  
+  if(isCorrect) {
+    const pts = state.difficulty === 'mudah' ? 10 : (state.difficulty === 'sedang' ? 20 : 30);
+    p.score += pts;
+    p.chests++;
+    p.correct++;
+    state.chestsOpened++;
+    
+    // Chest visual
+    const cel = getEle(chest.id);
+    cel.className = 'entity chest-entity opened';
+    chest.status = 'opened';
+    
+    createParticles(chest.x, chest.y);
+  } else {
+    p.wrong++;
+    chest.status = 'available';
+    chest.claimer = null;
+    const cel = getEle(chest.id);
+    cel.className = 'entity chest-entity available';
+    
+    // Knockback
+    knockbackPlayer(p);
+  }
+  
+  updatePlayerUI();
+  updateChestCounter();
+  
+  setTimeout(() => {
+    if(!state.playing) return;
+    p.state = 'idle';
+    p.activeChest = null;
+    p.qId = null;
+    getEle(`qa-${pId.toLowerCase()}`).innerHTML = '<div class="qa-idle">Jelajahi peta dan temukan peti harta karun!</div>';
+    checkWinCondition();
+  }, 3500); // 3.5s to read explanation
+}
+
+function knockbackPlayer(p) {
+  // Find nearest empty valid cell (BFS)
+  const queue = [{x: p.x, y: p.y}];
+  const visited = new Set([`${p.x},${p.y}`]);
+  let target = null;
+  
+  // Directions: Up, Right, Down, Left
+  const dirs = [[0,-1], [1,0], [0,1], [-1,0]];
+  
+  while(queue.length > 0) {
+    const curr = queue.shift();
+    // Is empty?
+    const hasChest = state.chests.some(c => c.x === curr.x && c.y === curr.y && c.status !== 'opened');
+    if(!hasChest) {
+      target = curr; break;
+    }
+    
+    for(let d of dirs) {
+      const nx = curr.x + d[0], ny = curr.y + d[1];
+      const key = `${nx},${ny}`;
+      if(nx>=0 && nx<MAP_SIZE && ny>=0 && ny<MAP_SIZE && !visited.has(key)) {
+        visited.add(key); queue.push({x:nx, y:ny});
+      }
+    }
+  }
+  
+  if(target) {
+    p.x = target.x; p.y = target.y;
+    const ael = getEle(`avatar-${p.id.toLowerCase()}`);
+    ael.style.transition = '0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'; // bounce
+    updateEntityPos(ael, p.x, p.y);
+    setTimeout(() => { ael.style.transition = 'left 0.25s linear, top 0.25s linear'; }, 300);
+  }
+}
+
+function createParticles(x, y) {
+  const container = getEle('map-grid');
+  for(let i=0; i<10; i++) {
+    const p = document.createElement('div');
+    p.style.position = 'absolute'; p.style.width = '10px'; p.style.height = '10px';
+    p.style.background = '#F1C40F'; p.style.borderRadius = '50%'; p.style.zIndex = '10';
+    p.style.left = `calc(${(x/MAP_SIZE)*100}% + 20px)`;
+    p.style.top = `calc(${(y/MAP_SIZE)*100}% + 20px)`;
+    
+    const angle = Math.random() * Math.PI * 2;
+    const dist = Math.random() * 50 + 20;
+    const tx = Math.cos(angle) * dist; const ty = Math.sin(angle) * dist;
+    
+    p.style.transition = 'all 0.6s ease-out';
+    container.appendChild(p);
+    
+    setTimeout(() => { p.style.transform = `translate(${tx}px, ${ty}px) scale(0)`; p.style.opacity = '0'; }, 10);
+    setTimeout(() => p.remove(), 600);
+  }
+}
+
+/* --- TIMER & SCORING --- */
+function gameLoop() {
+  if(!state.playing) return;
+  state.timer--;
+  updateTimerUI();
+  if(state.timer <= 0) {
+    endGame('Waktu Habis!');
+  }
+}
+
+function updateTimerUI() {
+  const m = Math.floor(state.timer / 60).toString().padStart(2, '0');
+  const s = (state.timer % 60).toString().padStart(2, '0');
+  const el = getEle('ui-timer');
+  el.innerText = `${m}:${s}`;
+  if(state.timer <= 30) el.classList.add('warning');
+  else el.classList.remove('warning');
+}
+
+function updatePlayerUI() {
+  getEle('score-a').innerText = state.players.A.score;
+  getEle('chest-a').innerText = state.players.A.chests;
+  getEle('score-b').innerText = state.players.B.score;
+  getEle('chest-b').innerText = state.players.B.chests;
+}
+
+function updateChestCounter() {
+  getEle('ui-chests').innerText = `${state.chestsOpened}/${TOTAL_CHESTS}`;
+}
+
+function checkWinCondition() {
+  if(state.chestsOpened >= TOTAL_CHESTS) {
+    endGame('Seluruh Harta Karun Telah Ditemukan!');
+  }
+}
+
+function endGame(reason) {
+  state.playing = false;
+  clearInterval(state.interval);
+  
+  // Calculate winner
+  let a = state.players.A, b = state.players.B;
+  let accA = a.correct+a.wrong > 0 ? Math.round((a.correct/(a.correct+a.wrong))*100) : 0;
+  let accB = b.correct+b.wrong > 0 ? Math.round((b.correct/(b.correct+b.wrong))*100) : 0;
+  
+  let winner = 'SERI';
+  if(a.score > b.score) winner = 'A';
+  else if(b.score > a.score) winner = 'B';
+  else { // Tiebreaker: Chests
+    if(a.chests > b.chests) winner = 'A';
+    else if(b.chests > a.chests) winner = 'B';
+    else { // Tiebreaker: Accuracy
+      if(accA > accB) winner = 'A';
+      else if(accB > accA) winner = 'B';
+    }
+  }
+  
+  // Populate UI
+  getEle('res-title').innerText = winner === 'SERI' ? 'PERTANDINGAN SERI!' : `PLAYER ${winner} MENJADI JUARA!`;
+  getEle('res-reason').innerText = reason;
+  
+  const bindStat = (pId, statObj, acc) => {
+    getEle(`r-score-${pId}`).innerText = statObj.score;
+    getEle(`r-chest-${pId}`).innerText = statObj.chests;
+    getEle(`r-ans-${pId}`).innerText = `${statObj.correct} / ${statObj.wrong}`;
+    getEle(`r-acc-${pId}`).innerText = `${acc}%`;
+    const card = getEle(`stat-${pId}`);
+    card.classList.remove('winner');
+    if(winner === pId.toUpperCase()) card.classList.add('winner');
+  };
+  
+  bindStat('a', a, accA);
+  bindStat('b', b, accB);
+  
+  showScreen('result');
+}
+
+// Start sequence
+window.onload = init;
+
+</script>
+</body>
+</html>
