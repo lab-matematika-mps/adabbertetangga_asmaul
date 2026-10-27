@@ -11,509 +11,526 @@
 :root {
   --primary: #0d5c63;
   --primary-dark: #07383c;
-  --secondary: #2ECC71;
-  --accent: #F1C40F;
-  --accent-glow: rgba(241, 196, 15, 0.8);
-  --bg-cream: #FFF8E7;
-  --text-dark: #1A252C;
+  --secondary: #10a37f;
+  --accent: #f5b82e;
+  --accent-glow: rgba(245, 184, 46, 0.8);
+  --amb: #e08a00;
+  --bg-cream: #fff6dc;
+  --text-dark: #12284a;
   --text-light: #F8F9FA;
-  --player-a: #00D2D3;
-  --player-b: #FF6B6B;
-  --danger: #E74C3C;
+  
+  /* Player Colors from Reference */
+  --player-a: #12b5c9; /* Cyan - Player 1 (Kanan) */
+  --player-a-dark: #0a6f7c;
+  --player-b: #ff7a45; /* Orange - Player 2 (Kiri) */
+  --player-b-dark: #b3441a;
+  
+  --danger: #d6482a;
   --cell-bg-1: #4ca1af;
   --cell-bg-2: #3b8d99;
-  --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-main: 'Trebuchet MS', Verdana, sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-body { font-family: var(--font-main); background: var(--primary); color: var(--text-dark); overflow: hidden; touch-action: none; }
+body { font-family: var(--font-main); background: var(--primary); color: var(--text-dark); overflow: hidden; touch-action: none; min-height: 100vh; }
 button { font-family: var(--font-main); cursor: pointer; border: none; outline: none; }
-h1, h2, h3 { font-weight: 800; }
+h1, h2, h3 { line-height: 1.15; font-weight: 800; }
 
 /* ==========================================================================
-   GLOBAL UI COMPONENTS & ANIMATIONS
+   GLOBAL UI COMPONENTS & BACKGROUND
    ========================================================================== */
-.screen { display: none; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; overflow: hidden; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
-.screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.5s ease-out; }
+.screen { display: none; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; overflow-y: auto; overflow-x: hidden; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); z-index: 1; padding: 18px; }
+.screen.active { display: block; animation: fin 0.5s ease; }
+@keyframes fin { from { opacity: 0; transform: translateY(14px); } }
 
-/* Background Patterns */
-.bg-pattern { position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0.05; pointer-events: none; background-image: radial-gradient(var(--accent) 2px, transparent 2px); background-size: 40px 40px; z-index: 0; }
-.bg-ornaments { position: absolute; width: 100%; height: 100%; top:0; left:0; pointer-events: none; z-index: 1; }
+/* Background Patterns (Ours) */
+.bg-pattern { position: fixed; width: 100%; height: 100%; top: 0; left: 0; opacity: 0.05; pointer-events: none; background-image: radial-gradient(var(--accent) 2px, transparent 2px); background-size: 40px 40px; z-index: 0; }
+.bg-ornaments { position: fixed; width: 100%; height: 100%; top:0; left:0; pointer-events: none; z-index: 0; }
 
-/* Enhanced Buttons */
-.btn { padding: 14px 28px; border-radius: 50px; font-size: 1.1rem; font-weight: bold; background: var(--secondary); color: white; box-shadow: 0 6px 0px #27ae60, 0 10px 20px rgba(0,0,0,0.3); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); text-transform: uppercase; display: flex; align-items: center; gap: 10px; z-index: 10; overflow: hidden; position: relative; }
-.btn svg { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.btn:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 8px 0px #27ae60, 0 15px 25px rgba(39, 174, 96, 0.4); }
-.btn:hover svg { transform: scale(1.2) rotate(5deg); }
-.btn:active { transform: translateY(4px) scale(0.98); box-shadow: 0 2px 0px #27ae60, 0 5px 10px rgba(0,0,0,0.3); }
+/* Buttons (Reference Style) */
+.btn { border: 0; border-radius: 16px; padding: 13px 22px; font: inherit; font-weight: 800; font-size: 1.05rem; color: #fff; background: linear-gradient(var(--secondary), #0a7f64); box-shadow: 0 5px 0 #075a47, 0 10px 18px rgba(0,0,0,0.3); cursor: pointer; transition: 0.15s; display: inline-flex; gap: 10px; align-items: center; justify-content: center; text-transform: uppercase; z-index: 10;}
+.btn:hover { transform: translateY(-3px); }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #075a47; }
+.btn.gold { background: linear-gradient(#ffd45c, var(--amb)); color: var(--text-dark); box-shadow: 0 5px 0 #a35f00, 0 10px 18px rgba(0,0,0,0.3); }
+.btn.gold:active { box-shadow: 0 1px 0 #a35f00; }
+.btn.red { background: linear-gradient(#ff8a6b, var(--danger)); box-shadow: 0 5px 0 #8f2b14, 0 10px 18px rgba(0,0,0,0.3); }
+.btn.red:active { box-shadow: 0 1px 0 #8f2b14; }
+.btn:disabled { filter: grayscale(1); opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn svg { width: 1.3em; height: 1.3em; fill: currentColor; flex: none; }
 
-.btn-accent { background: var(--accent); color: var(--text-dark); box-shadow: 0 6px 0px #d4ac0d; }
-.btn-accent:hover { box-shadow: 0 8px 0px #d4ac0d, 0 15px 25px var(--accent-glow); }
-.btn-accent:active { box-shadow: 0 2px 0px #d4ac0d; }
-
-.btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); box-shadow: none; }
-.btn-outline:hover { background: rgba(241, 196, 15, 0.1); box-shadow: 0 5px 15px rgba(241, 196, 15, 0.2); }
-
-.panel-card { background: var(--bg-cream); border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); border: 4px solid rgba(241, 196, 15, 0.5); position: relative; z-index: 10; max-width: 900px; width: 90%; max-height: 90vh; overflow-y: auto; text-align: center; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-
-/* Animations */
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes popIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-@keyframes titleMystery { 
-  0% { text-shadow: 0 0 10px rgba(241,196,15,0.4), 0 5px 15px rgba(0,0,0,0.5); transform: translateY(0); } 
-  50% { text-shadow: 0 0 30px rgba(241,196,15,1), 0 15px 20px rgba(0,0,0,0.4); transform: translateY(-8px); letter-spacing: 2px; } 
-  100% { text-shadow: 0 0 10px rgba(241,196,15,0.4), 0 5px 15px rgba(0,0,0,0.5); transform: translateY(0); } 
-}
-@keyframes floatChest { 
-  0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 10px 15px var(--accent-glow)); } 
-  50% { transform: translateY(-20px) scale(1.05); filter: drop-shadow(0 30px 35px var(--accent-glow)); } 
-}
+.panelc { background: var(--bg-cream); border-radius: 22px; padding: 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); border: 3px solid var(--accent); position: relative; z-index: 10; margin: 0 auto; max-width: 900px; }
+.center { text-align: center; }
 
 /* ==========================================================================
-   HOME SCREEN (MYSTERY VIBE)
+   HOME SCREEN (REFERENCE VIBE)
    ========================================================================== */
-.hero-title { font-size: 3.5rem; color: var(--accent); text-align: center; margin-bottom: 5px; text-transform: uppercase; animation: titleMystery 4s ease-in-out infinite; }
-.hero-subtitle { font-size: 1.5rem; color: var(--secondary); margin-bottom: 15px; text-align: center; font-weight: bold; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-.hero-desc { max-width: 600px; text-align: center; color: var(--text-light); font-size: 1.1rem; line-height: 1.6; margin-bottom: 35px; opacity: 0.9; }
-.home-buttons { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
-.hero-illustration { width: 220px; height: 220px; margin: 0 auto 20px; position: relative; animation: floatChest 4s ease-in-out infinite; }
+#home { text-align: center; padding-top: 5vh; display: none; flex-direction: column; align-items: center; justify-content: center; }
+#home.active { display: flex; }
+.logo { font-size: clamp(2.2rem, 6vw, 4.2rem); font-weight: 900; color: #fff; text-shadow: 0 4px 0 #0b4f5c, 0 8px 18px rgba(0,0,0,0.6); letter-spacing: 1px; animation: up 0.9s both; }
+.logo span { color: var(--accent); }
+.sub { font-size: clamp(1.2rem, 2.6vw, 1.8rem); font-weight: 800; color: var(--accent); animation: up 0.9s 0.15s both; text-shadow: 0 2px 4px rgba(0,0,0,0.5); margin-top: 5px; }
+.tag { font-weight: 700; color: var(--text-light); margin: 8px 0; animation: up 0.9s 0.3s both; letter-spacing: 1px; }
+.desc { max-width: 620px; margin: 8px auto 0; background: rgba(255,255,255,0.15); backdrop-filter: blur(5px); padding: 12px 18px; border-radius: 14px; animation: up 0.9s 0.4s both; color: white; border: 1px solid rgba(255,255,255,0.2); line-height: 1.5; }
+
+@keyframes up { from { opacity: 0; transform: translateY(30px); } }
+
+/* STAGE ANIMATIONS */
+.stage { display: flex; justify-content: center; align-items: flex-end; gap: clamp(8px, 4vw, 50px); margin: 20px 0; }
+.stage .big { width: clamp(70px, 12vw, 130px); animation: float 3s ease-in-out infinite; }
+.stage .big:nth-child(3) { animation-delay: 1.2s; }
+.stage .chestbig { width: clamp(100px, 16vw, 170px); position: relative; filter: drop-shadow(0 0 14px #ffd45c); animation: glow 2.4s infinite; }
+@keyframes float { 50% { transform: translateY(-12px); } }
+@keyframes glow { 50% { filter: drop-shadow(0 0 30px #fff2a8); } }
+.coin { position: absolute; width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(#fff2a8, var(--accent) 60%, var(--amb)); animation: spin 1.6s linear infinite; }
+@keyframes spin { 50% { transform: scaleX(0.15); } }
+
+.menu { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 15px; }
 
 /* ==========================================================================
-   SLIDE / MATERI SCREEN
+   MATERI & CARA BERMAIN
    ========================================================================== */
-.slide-container { display: flex; flex-direction: column; height: 100%; width: 100%; }
-.slide-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.slide-card { background: var(--bg-cream); border-radius: 20px; padding: 40px; width: 100%; max-width: 800px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 2px solid var(--accent); animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; display: none; }
+.slidewrap { max-width: 1000px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; }
+.slide-content { flex: 1; padding: 20px 0; }
+.slide-card { background: var(--bg-cream); border-radius: 20px; padding: 30px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 3px solid var(--accent); animation: sl 0.5s ease; display: none; color: var(--text-dark); }
 .slide-card.active { display: block; }
-.slide-title { font-size: 2rem; color: var(--primary); border-bottom: 3px solid var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
-.slide-body { font-size: 1.2rem; line-height: 1.6; color: var(--text-dark); text-align: left; }
-.slide-body ul { padding-left: 25px; margin-top: 15px; }
-.slide-body li { margin-bottom: 10px; }
-.slide-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); }
-.slide-dots { display: flex; gap: 8px; }
-.dot { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: 0.3s; }
-.dot.active { background: var(--accent); transform: scale(1.4); box-shadow: 0 0 10px var(--accent); }
+@keyframes sl { from { opacity: 0; transform: translateX(40px) scale(0.97); } }
+.slide-title { font-size: 2rem; color: var(--primary-dark); border-bottom: 3px solid var(--accent); padding-bottom: 10px; margin-bottom: 15px; }
+.slide-body { font-size: 1.15rem; line-height: 1.6; }
+.slide-body ul { padding-left: 25px; margin-top: 10px; }
+.slide-body li { margin-bottom: 8px; }
+.nav { display: flex; align-items: center; gap: 10px; justify-content: space-between; margin-top: 15px; flex-wrap: wrap; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 20px; }
+.dots { display: flex; gap: 8px; justify-content: center; flex: 1; }
+.dot { width: 16px; height: 16px; border-radius: 50%; background: #fff; cursor: pointer; transition: 0.3s; border: 2px solid var(--primary); }
+.dot.active { background: var(--accent); transform: scale(1.3); }
 
-@keyframes slideIn { from { opacity: 0; transform: translateX(100px) rotate(2deg); } to { opacity: 1; transform: translateX(0) rotate(0); } }
-
-/* ==========================================================================
-   CARA BERMAIN
-   ========================================================================== */
-.how-to-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; text-align: left; margin: 20px 0; }
-.step-card { background: rgba(255,255,255,0.7); padding: 15px; border-radius: 12px; border-left: 6px solid var(--accent); transition: 0.3s; }
-.step-card:hover { transform: translateY(-5px); background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-.step-title { font-weight: bold; color: var(--primary); margin-bottom: 5px; font-size: 1.1rem; }
+/* Cara Bermain Grid */
+.how-to-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 15px; margin: 15px 0; }
+.step-card { background: #fff4d6; color: var(--text-dark); border-radius: 12px; padding: 15px; box-shadow: 0 4px 0 rgba(0,0,0,0.2); animation: up 0.5s both; }
+.step-card b { display: inline-block; background: var(--amb); color: #fff; border-radius: 50%; width: 30px; height: 30px; text-align: center; line-height: 30px; margin-right: 8px; }
+.step-title { font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; margin-bottom: 8px; color: var(--primary-dark); }
 
 /* ==========================================================================
-   DIFFICULTY & SETTINGS SCREEN
+   SETTINGS / KONFIGURASI (REFERENCE STYLE)
    ========================================================================== */
-.settings-container { display: flex; flex-direction: column; gap: 30px; align-items: center; z-index: 10; max-width: 900px; }
-.setting-section { background: rgba(0,0,0,0.4); padding: 25px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.1); text-align: center; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); backdrop-filter: blur(5px); }
-.setting-title { color: var(--accent); margin-bottom: 15px; font-size: 1.5rem; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+.opts3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 15px 0 25px; }
+.opt { background: #fff; border: 5px solid transparent; border-radius: 20px; padding: 18px; text-align: left; font: inherit; color: var(--text-dark); cursor: pointer; box-shadow: 0 5px 14px rgba(0,0,0,0.3); transition: 0.2s; position: relative; }
+.opt:hover { transform: translateY(-6px) rotate(-1deg); }
+.opt.sel { border-color: var(--accent); background: #fff3c4; }
+.opt.sel::after { content: "✔ DIPILIH"; position: absolute; top: 10px; right: 12px; background: var(--secondary); color: #fff; border-radius: 10px; padding: 4px 10px; font-size: 0.8rem; font-weight: 800; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.opt h3 { font-size: 1.5rem; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+.opt p { font-size: 0.95rem; margin-bottom: 8px; opacity: 0.9; }
+.opt ul { margin: 6px 0 0 20px; font-size: 0.9rem; }
+.opt svg { width: 32px; height: 32px; }
 
-/* Chest Count Selection */
-.count-options { display: flex; gap: 15px; justify-content: center; }
-.count-btn { background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); color: white; padding: 10px 25px; border-radius: 12px; font-size: 1.2rem; font-weight: bold; transition: 0.3s; }
-.count-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-3px); }
-.count-btn.active { background: var(--secondary); border-color: #27ae60; box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4); transform: scale(1.1); }
-
-/* Difficulty Cards */
-.diff-cards { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
-.diff-card { background: white; border: 4px solid transparent; border-radius: 15px; padding: 25px; width: 240px; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 5px 15px rgba(0,0,0,0.2); position: relative; overflow: hidden; }
-.diff-card:hover { transform: translateY(-10px) scale(1.03); border-color: var(--accent); }
-.diff-card.selected { border-color: var(--accent); background: var(--bg-cream); transform: scale(1.08) translateY(-5px); box-shadow: 0 15px 30px var(--accent-glow); }
-.diff-title { font-size: 1.8rem; font-weight: bold; margin-bottom: 10px; }
-.diff-desc { font-size: 1rem; color: #555; }
-.diff-card.mudah .diff-title { color: #2ecc71; }
-.diff-card.sedang .diff-title { color: #f39c12; }
-.diff-card.sulit .diff-title { color: #e74c3c; }
+.sum { background: var(--primary-dark); color: #fff; border-radius: 16px; padding: 15px 20px; margin: 15px 0; font-weight: 700; text-align: center; font-size: 1.1rem; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 
 /* ==========================================================================
-   GAME ARENA
+   GAME ARENA (REFERENCE LAYOUT)
    ========================================================================== */
-#arena { flex-direction: column; justify-content: flex-start; }
-.arena-header { width: 100%; height: 75px; background: rgba(0,0,0,0.6); display: flex; justify-content: space-between; align-items: center; padding: 0 25px; color: white; border-bottom: 4px solid var(--accent); z-index: 10; box-shadow: 0 5px 20px rgba(0,0,0,0.4); }
-.timer { font-size: 2.8rem; font-weight: bold; font-family: monospace; color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); transition: 0.3s; }
-.timer.warning { color: var(--danger); text-shadow: 0 0 15px rgba(231, 76, 60, 0.8); animation: pulseTimer 1s infinite; }
-.chest-counter { font-size: 1.3rem; display: flex; align-items: center; gap: 10px; font-weight: bold; }
+#arena { padding: 10px; overflow-y: auto; align-items: stretch; justify-content: flex-start; }
+.gh { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; background: rgba(11, 79, 92, 0.9); color: #fff; border-radius: 16px; padding: 10px 18px; margin-bottom: 12px; font-weight: 700; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 10; border: 2px solid rgba(255,255,255,0.1); }
+.gh .tm { font-size: 2rem; font-weight: 900; background: rgba(0,0,0,0.5); border-radius: 12px; padding: 2px 18px; color: var(--accent); font-family: monospace; letter-spacing: 2px; }
+.gh .tm.low { animation: pulse 1s infinite; color: #ff7a7a; }
+@keyframes pulse { 50% { transform: scale(1.1); } }
 
-@keyframes pulseTimer { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+.arena-layout { display: grid; grid-template-columns: 27fr 46fr 27fr; gap: 12px; align-items: start; max-width: 1400px; margin: 0 auto; width: 100%; }
 
-.arena-layout { display: flex; width: 100%; height: calc(100vh - 75px); max-width: 1500px; margin: 0 auto; }
-.player-panel { flex: 1; display: flex; flex-direction: column; padding: 15px; background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); z-index: 10; max-width: 360px; }
-#panel-b { border-right: 4px solid var(--player-b); background: linear-gradient(to right, rgba(255, 107, 107, 0.15), transparent); }
-#panel-a { border-left: 4px solid var(--player-a); background: linear-gradient(to left, rgba(0, 210, 211, 0.15), transparent); }
+/* Player Panel styling matching reference */
+.panel { background: var(--bg-cream); border-radius: 18px; padding: 12px; border: 5px solid var(--c); display: flex; flex-direction: column; gap: 10px; min-height: calc(100vh - 100px); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+#panel-b { --c: var(--player-b); } /* Left = Player 2 */
+#panel-a { --c: var(--player-a); } /* Right = Player 1 */
 
-.player-info { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; background: var(--bg-cream); padding: 12px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.5); }
-.avatar-thumb { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: bold; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.4); border: 2px solid white; }
-#panel-b .avatar-thumb { background: var(--player-b); }
-#panel-a .avatar-thumb { background: var(--player-a); }
-.player-stats { flex: 1; }
-.player-stats h3 { font-size: 1.2rem; margin-bottom: 2px; }
-.player-stats p { font-size: 0.95rem; font-weight: bold; color: var(--text-dark); margin: 2px 0; display: flex; justify-content: space-between; }
+.ph { display: flex; align-items: center; gap: 10px; }
+.ph svg { width: 50px; flex: none; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)); }
+.ph h3 { flex: 1; font-size: 1.15rem; color: var(--text-dark); }
+.ph .sc { font-size: 2.5rem; font-weight: 900; color: var(--c); text-shadow: 0 2px 0 rgba(0,0,0,0.2); }
 
-.qa-space { flex: 1; background: white; border-radius: 12px; padding: 18px; overflow-y: auto; box-shadow: inset 0 3px 10px rgba(0,0,0,0.1); margin-bottom: 15px; display: flex; flex-direction: column; position: relative; border: 3px solid transparent; transition: 0.3s; }
-.qa-space.active-qa { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
-.qa-idle { text-align: center; color: #7f8c8d; margin: auto; font-style: italic; font-size: 1.1rem; animation: pulseOpacity 2s infinite; }
-.question-text { font-size: 1.15rem; font-weight: bold; margin-bottom: 18px; color: var(--primary); line-height: 1.5; }
-.options-grid { display: flex; flex-direction: column; gap: 10px; }
-.opt-btn { background: #f8f9fa; border: 2px solid #bdc3c7; border-radius: 10px; padding: 12px; text-align: left; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; color: #2c3e50; font-weight: bold; font-size: 1rem; }
-.opt-btn:hover { background: #e0e6ed; border-color: var(--primary); transform: translateX(5px); }
-.opt-btn.selected { background: var(--accent); border-color: #d4ac0d; color: var(--text-dark); transform: scale(1.02); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-.opt-btn.correct { background: var(--secondary); border-color: #27ae60; color: white; animation: shakeSuccess 0.5s; }
-.opt-btn.wrong { background: var(--danger); border-color: #c0392b; color: white; animation: shakeError 0.5s; }
-.submit-ans { margin-top: 15px; width: 100%; background: var(--primary); color: white; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1.1rem; transition: 0.3s; }
-.submit-ans:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 10px rgba(0,0,0,0.3); }
-.submit-ans:disabled { background: #95a5a6; cursor: not-allowed; opacity: 0.7; }
-.feedback-box { margin-top: 15px; padding: 12px; border-radius: 10px; font-size: 1rem; font-weight: bold; display: none; text-align: center; }
-.feedback-box.show { display: block; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.feedback-box.correct { background: #d4efdf; color: #1e8449; border: 2px solid #27ae60; }
-.feedback-box.wrong { background: #f5b7b1; color: #c0392b; border: 2px solid #e74c3c; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font-size: 0.75rem; text-align: center; color: var(--text-dark); }
+.stats div { background: #fff; border-radius: 10px; padding: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05); }
+.stats b { display: block; font-size: 1.1rem; margin-bottom: 2px; }
 
-@keyframes pulseOpacity { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
-@keyframes shakeError { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
-@keyframes shakeSuccess { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+.qbox { flex: 1; min-height: 250px; background: #fff; border-radius: 14px; padding: 15px; overflow-y: auto; box-shadow: inset 0 3px 8px rgba(0,0,0,0.1); border: 2px solid transparent; transition: 0.3s; }
+.qbox.active-qa { border-color: var(--accent); box-shadow: inset 0 3px 8px rgba(0,0,0,0.1), 0 0 15px var(--accent-glow); }
+.qbox .idle { height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 800; color: var(--primary-dark); font-size: 1.1rem; padding: 10px; opacity: 0.7; }
+.qbox .qtype { font-size: 0.8rem; font-weight: 800; color: #fff; background: var(--c); display: inline-block; padding: 4px 10px; border-radius: 10px; margin-bottom: 10px; }
+.qbox .qtext { font-weight: 800; margin: 5px 0 15px; font-size: 1.1rem; line-height: 1.4; color: var(--text-dark); }
+.qbox.new { animation: qin 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes qin { from { opacity: 0; transform: scale(0.92); } }
 
-/* DIRECTIONAL PAD (D-PAD) REPLACING JOYSTICK */
-.dpad-area { padding-bottom: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.dpad-container { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 6px; width: 160px; justify-content: center; }
-.dpad-btn { background: rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.4); border-radius: 10px; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.1s; font-size: 1.5rem; height: 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); user-select: none; -webkit-tap-highlight-color: transparent; }
-.dpad-btn:active, .dpad-btn.pressed { background: var(--accent); color: var(--text-dark); transform: scale(0.9) translateY(2px); box-shadow: 0 1px 2px rgba(0,0,0,0.3); border-color: white; }
-.dpad-up { grid-column: 2; grid-row: 1; border-top-left-radius: 20px; border-top-right-radius: 20px; }
-.dpad-left { grid-column: 1; grid-row: 2; border-top-left-radius: 20px; border-bottom-left-radius: 20px; }
-.dpad-down { grid-column: 2; grid-row: 2; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;}
-.dpad-right { grid-column: 3; grid-row: 2; border-top-right-radius: 20px; border-bottom-right-radius: 20px;}
+/* Question Answers */
+.options-grid { display: flex; flex-direction: column; gap: 8px; }
+.ans { display: block; width: 100%; text-align: left; border: 3px solid #b9d6dc; background: #f2fbfc; border-radius: 12px; padding: 10px 12px; font: inherit; font-weight: 700; color: var(--text-dark); cursor: pointer; transition: 0.15s; font-size: 0.95rem; }
+.ans:hover { background: #dff6fa; border-color: var(--c); transform: translateX(4px); }
+.ans.tf { display: inline-block; width: 48%; text-align: center; font-size: 1.1rem; padding: 12px; }
+.tf-wrap { display: flex; justify-content: space-between; }
+.ans.chk { background: #fff3c4; border-color: var(--amb); }
+.ans input { margin-right: 10px; transform: scale(1.3); cursor: pointer; }
+.ans.selected { background: var(--accent); border-color: #d4ac0d; }
+.ans.correct { background: #dcf8e6; border-color: var(--secondary); color: #075a47; animation: pop 0.5s; }
+.ans.wrong { background: #ffe5dc; border-color: var(--danger); color: #8f2b14; animation: shake 0.5s; }
 
-#panel-b .dpad-btn:active, #panel-b .dpad-btn.pressed { background: var(--player-b); }
-#panel-a .dpad-btn:active, #panel-a .dpad-btn.pressed { background: var(--player-a); }
+/* Custom Notification & Feedback */
+.note { min-height: 1.5em; font-size: 0.9rem; font-weight: 800; color: #b3320f; text-align: center; margin-top: 5px; text-shadow: 0 1px 2px rgba(255,255,255,0.8); }
+.fb { padding: 12px; border-radius: 12px; animation: qin 0.35s; margin-top: 10px; font-size: 0.95rem; }
+.fb h3 { margin-bottom: 5px; }
+.fb.ok { background: #dcf8e6; border: 3px solid var(--secondary); color: #075a47; animation: pop 0.5s; }
+.fb.no { background: #ffe5dc; border: 3px solid var(--danger); color: #8f2b14; animation: shake 0.5s; }
+@keyframes pop { 50% { transform: scale(1.04); } }
+@keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 
-.kbd-hint { font-size: 0.85rem; color: white; margin-top: 10px; opacity: 0.8; font-weight: bold; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 20px; }
+/* D-PAD (Reference Style) */
+.dpad-area { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.dpad { display: grid; grid-template-columns: repeat(3, 65px); grid-template-rows: repeat(3, 65px); gap: 5px; justify-content: center; }
+.dp { border: 0; border-radius: 16px; background: var(--c); color: #fff; box-shadow: 0 6px 0 rgba(0,0,0,0.3), 0 10px 15px rgba(0,0,0,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; touch-action: none; user-select: none; transition: 0.1s; }
+.dp svg { width: 32px; height: 32px; fill: currentColor; }
+.dp:hover { filter: brightness(1.15); transform: translateY(-2px); box-shadow: 0 8px 0 rgba(0,0,0,0.3), 0 12px 18px rgba(0,0,0,0.4); }
+.dp.press, .dp:active { transform: scale(0.92) translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,0.4); filter: brightness(1.2); }
+.dp[data-d=u] { grid-area: 1/2; } .dp[data-d=l] { grid-area: 2/1; } .dp[data-d=r] { grid-area: 2/3; } .dp[data-d=d] { grid-area: 3/2; }
+.dp[data-d=l] svg { transform: rotate(-90deg); } .dp[data-d=r] svg { transform: rotate(90deg); } .dp[data-d=d] svg { transform: rotate(180deg); }
+.dmid { grid-area: 2/2; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1.8rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3)); }
 
 /* MAP */
-.map-section { flex: 2; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; }
-.map-container { width: 100%; max-width: 650px; aspect-ratio: 1/1; background: var(--primary-dark); border: 12px solid #2c3e50; border-radius: 15px; box-shadow: 0 25px 50px rgba(0,0,0,0.6); position: relative; overflow: hidden; display: grid; grid-template-columns: repeat(9, 1fr); grid-template-rows: repeat(9, 1fr); }
-.grid-cell { border: 1px solid rgba(255,255,255,0.05); }
-.grid-cell:nth-child(even) { background: var(--cell-bg-1); }
-.grid-cell:nth-child(odd) { background: var(--cell-bg-2); }
+.mapwrap { display: flex; justify-content: center; align-items: center; }
+.map-container { position: relative; width: min(100%, calc(100vh - 120px)); aspect-ratio: 1; border-radius: 18px; border: 8px solid #6d3f17; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6); background: #7bd389; }
+.grid { position: absolute; inset: 0; display: grid; }
+.cell { background: #8fe09a; border: 1px solid rgba(0,0,0,0.03); }
+.cell.alt { background: #7ad18a; }
+.layer { position: absolute; inset: 0; }
 
 /* Entities */
-.entity { position: absolute; width: calc(100% / 9); height: calc(100% / 9); transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; align-items: center; justify-content: center; z-index: 5; pointer-events: none; }
+.entity { position: absolute; transition: left 0.2s linear, top 0.2s linear; display: flex; align-items: center; justify-content: center; z-index: 5; pointer-events: none; }
+.entity .in { width: 100%; height: 100%; padding: 10%; display: flex; align-items: center; justify-content: center; }
+.entity svg { width: 100%; height: 100%; overflow: visible; }
+
 .avatar-entity { z-index: 7; }
-.avatar-body { width: 75%; height: 75%; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 15px rgba(0,0,0,0.5); border: 3px solid white; font-weight: bold; color: white; font-size: 1.3rem; transition: transform 0.2s; }
-.avatar-entity.moving .avatar-body { transform: scale(1.1) translateY(-3px); }
-#avatar-b .avatar-body { background: var(--player-b); }
-#avatar-a .avatar-body { background: var(--player-a); }
+.avatar-entity .in { animation: idle 1.6s ease-in-out infinite; }
+.avatar-entity.moving .in { animation: walk 0.2s; }
+.avatar-entity.hit .in { animation: hit 0.4s; }
+
+@keyframes idle { 50% { transform: translateY(-8%); } }
+@keyframes walk { 50% { transform: translateY(-25%) rotate(8deg) scale(1.1); } }
+@keyframes hit { 30% { transform: scale(1.3) rotate(25deg); } 100% { transform: scale(1) rotate(0); } }
 
 .chest-entity { z-index: 5; }
-.chest-svg { width: 85%; height: 85%; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5)); transition: all 0.3s; }
-.chest-entity.available { animation: chestGlow 2s infinite; }
-.chest-entity.claimed-a { filter: drop-shadow(0 0 20px var(--player-a)); transform: scale(1.15); z-index: 6; }
-.chest-entity.claimed-b { filter: drop-shadow(0 0 20px var(--player-b)); transform: scale(1.15); z-index: 6; }
-.chest-entity.opened { opacity: 0; transform: scale(0) translateY(-30px); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.chest-entity .lock-icon { display: none; position: absolute; top: -12px; background: rgba(0,0,0,0.8); color: white; padding: 3px 8px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.4); animation: popIn 0.3s; }
-.chest-entity.claimed-a .lock-icon, .chest-entity.claimed-b .lock-icon { display: block; }
-.chest-entity.claimed-a .lock-icon { border: 2px solid var(--player-a); }
-.chest-entity.claimed-b .lock-icon { border: 2px solid var(--player-b); }
+.chest-entity .in { animation: shine 2.2s infinite; }
+@keyframes shine { 50% { filter: drop-shadow(0 0 10px #ffe56a); } }
+.chest-entity.claimed .in { animation: none; filter: drop-shadow(0 0 12px #fff) grayscale(0.2); transform: scale(1.15); z-index: 6; }
+.chest-entity.claimed::after { content: "🔒"; position: absolute; top: -5%; right: -5%; font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); animation: qin 0.3s; }
+.chest-entity.opened .in { animation: vanish 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+.chest-entity .lid { transform-box: fill-box; transform-origin: left bottom; transition: 0.4s; }
+.chest-entity.opened .lid { transform: rotate(-40deg); }
+@keyframes vanish { to { transform: translateY(-40%) scale(1.5); opacity: 0; } }
 
-@keyframes chestGlow { 
-  0%, 100% { filter: drop-shadow(0 0 3px var(--accent)); transform: scale(1); } 
-  50% { filter: drop-shadow(0 0 15px var(--accent)); transform: scale(1.08); } 
-}
+/* Particle Coins */
+.cn { position: absolute; z-index: 8; width: 20%; height: 20%; border-radius: 50%; background: radial-gradient(#fff2a8, var(--accent) 60%, var(--amb)); animation: fly 0.8s forwards; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+@keyframes fly { to { transform: translate(var(--x), var(--y)) scale(0.3); opacity: 0; } }
 
 /* ==========================================================================
    RESULTS SCREEN
    ========================================================================== */
-#result { text-align: center; }
-.result-title { font-size: 3.5rem; color: var(--accent); margin-bottom: 10px; text-shadow: 0 5px 15px rgba(0,0,0,0.6); animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.stats-container { display: flex; gap: 30px; justify-content: center; margin-bottom: 35px; flex-wrap: wrap; }
-.stat-card { background: white; padding: 25px; border-radius: 20px; width: 280px; box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-top: 6px solid #ccc; transition: 0.4s; }
-.stat-card.winner { transform: scale(1.15) translateY(-10px); border-color: var(--accent); box-shadow: 0 20px 40px var(--accent-glow); z-index: 2; }
-.stat-card#stat-a { border-color: var(--player-a); }
-.stat-card#stat-b { border-color: var(--player-b); }
-.stat-name { font-size: 1.8rem; font-weight: bold; margin-bottom: 20px; }
-.stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.2rem; border-bottom: 1px dashed #ddd; padding-bottom: 8px; }
+#result { text-align: center; display: none; align-items: center; justify-content: center; }
+#result.active { display: flex; }
+.res { max-width: 900px; margin: 0 auto; width: 100%; animation: qin 0.5s; }
+.res h1 { font-size: clamp(2rem, 5vw, 3.8rem); color: #fff; text-shadow: 0 5px 0 var(--primary-dark), 0 10px 20px rgba(0,0,0,0.5); margin-bottom: 20px; }
+.rs { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+.rc { background: var(--bg-cream); border-radius: 22px; padding: 20px; border: 6px solid var(--c); text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.4); transition: 0.4s; }
+.rc.win { box-shadow: 0 0 40px var(--accent-glow); animation: pop 1s 2; transform: scale(1.05) translateY(-10px); z-index: 2; border-color: var(--accent); }
+.rc svg { width: 100px; display: block; margin: 0 auto 15px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); }
+.rc.win svg { animation: float 1.5s ease-in-out infinite; }
+.rc table { width: 100%; font-weight: 700; font-size: 1.15rem; color: var(--text-dark); }
+.rc td { padding: 6px 0; border-bottom: 1px dashed #ccc; }
+.rc tr:last-child td { border-bottom: none; }
+.rc td:last-child { text-align: right; color: var(--c); font-size: 1.3rem; }
 
-/* Responsive adjustments */
-@media (max-width: 900px) {
-  .arena-layout { flex-direction: column; overflow-y: auto; height: auto; padding-bottom: 20px; }
-  .map-section { order: -1; min-height: 450px; }
-  .player-panel { max-width: 100%; border: none; border-bottom: 2px solid rgba(255,255,255,0.2); flex-direction: row; flex-wrap: wrap; height: auto; align-items:flex-start; }
-  .qa-space { width: 100%; margin: 10px 0; max-height: 300px; }
-  .dpad-area { width: 100%; height: auto; margin-top: 10px; flex-direction: row; justify-content: space-around; }
+.conf { position: fixed; top: -20px; width: 12px; height: 16px; z-index: 30; animation: fall linear forwards; border-radius: 2px; }
+@keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+/* Responsive */
+@media (max-width: 1000px) {
+  .arena-layout { grid-template-columns: 1fr 1fr; }
+  .mapwrap { grid-column: 1 / 3; order: -1; }
+  .panel { min-height: 0; flex-direction: row; flex-wrap: wrap; align-items: flex-start; }
+  .ph, .stats, .qbox, .dpad-area { width: 100%; }
+  .dpad-area { flex-direction: row; justify-content: space-around; margin-top: 10px; }
+  .rs { grid-template-columns: 1fr; }
+  .rc.win { transform: scale(1.02); }
 }
 </style>
 </head>
 <body>
 
-<div id="app">
-  <!-- DECORATIVE BG -->
-  <div class="bg-pattern"></div>
-  <div class="bg-ornaments" id="particles"></div>
+<!-- DECORATIVE BG -->
+<div class="bg-pattern"></div>
+<div class="bg-ornaments" id="particles"></div>
 
-  <!-- 1. HOME SCREEN -->
-  <section id="home" class="screen active">
-    <div class="hero-illustration">
-      <svg viewBox="0 0 100 100" width="100%" height="100%">
-        <path d="M10,40 L90,40 L85,85 L15,85 Z" fill="#D4AF37" stroke="#8C6E15" stroke-width="3"/>
-        <path d="M10,40 C10,15 90,15 90,40 Z" fill="#F1C40F" stroke="#8C6E15" stroke-width="3"/>
-        <rect x="42" y="32" width="16" height="16" rx="3" fill="#8C6E15"/>
-        <circle cx="50" cy="40" r="4" fill="#333"/>
-        <path d="M48,40 L48,46 L52,46 L52,40 Z" fill="#333"/>
-        <!-- Ornaments -->
-        <circle cx="20" cy="25" r="3" fill="white" opacity="0.8" animation="pulse 1s infinite"/>
-        <circle cx="80" cy="25" r="3" fill="white" opacity="0.8"/>
-        <path d="M15,60 L85,60" stroke="#8C6E15" stroke-width="2"/>
-        <polygon points="50,10 52,18 60,20 52,22 50,30 48,22 40,20 48,18" fill="#FFF" opacity="0.7"/>
-      </svg>
-    </div>
-    <h1 class="hero-title">Misi Adab Bertetangga</h1>
-    <h2 class="hero-subtitle">Misteri Harta Karun Tersembunyi</h2>
-    <p class="hero-desc">Sebuah peta rahasia telah terungkap! Konon, di lingkungan ini terdapat harta karun yang hanya bisa dibuka oleh mereka yang berakhlak mulia kepada tetangganya. Siapkan dirimu, pecahkan misterinya, dan jadilah pemburu terbaik!</p>
-    <div class="home-buttons">
-      <button class="btn" onclick="showScreen('materi')">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg> Materi
-      </button>
-      <button class="btn" onclick="showScreen('cara-bermain')">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg> Cara Bermain
-      </button>
-      <button class="btn btn-accent" onclick="showScreen('settings')">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Mulai Bermain
-      </button>
-    </div>
-  </section>
+<!-- 1. HOME SCREEN -->
+<section id="home" class="screen active">
+  <h1 class="logo">MISI ADAB <span>BERTETANGGA</span></h1>
+  <div class="sub">Misteri Harta Karun Tersembunyi</div>
+  <div class="tag">Jelajahi Peta, Tebar Kebaikan, Raih Kemenangan!</div>
+  <div class="desc">Ayo belajar akhlak kepada tetangga Muslim dan non-Muslim, lalu berduel mencari peti harta karun dengan menjawab pertanyaan!</div>
+  
+  <div class="stage" id="homeStage">
+    <!-- SVG Injected via JS -->
+  </div>
+  
+  <div class="menu">
+    <button class="btn" onclick="showScreen('materi')">
+      <svg viewBox="0 0 24 24"><path d="M4 4h7a3 3 0 0 1 1 .2A3 3 0 0 1 13 4h7v15h-7a2 2 0 0 0-2 1 2 2 0 0 0-2-1H4z"/></svg> MATERI
+    </button>
+    <button class="btn gold" onclick="showScreen('cara-bermain')">
+      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm3.5 6.5-2 5-5 2 2-5z"/></svg> CARA BERMAIN
+    </button>
+    <button class="btn red" onclick="showScreen('settings')">
+      <svg viewBox="0 0 24 24"><path d="M3 10a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v1H3zm0 2h7v2h4v-2h7v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> MULAI BERMAIN
+    </button>
+  </div>
+</section>
 
-  <!-- 2. MATERI SCREEN -->
-  <section id="materi" class="screen">
-    <div class="slide-container">
-      <div class="slide-content" id="slide-content">
-        <!-- Slides injected by JS -->
-      </div>
-      <div class="slide-nav">
-        <button class="btn btn-outline" onclick="prevSlide()" id="btn-prev" style="color:white; border-color:white; background:rgba(255,255,255,0.1);">&#8592; Sebelumnya</button>
-        <div class="slide-dots" id="slide-dots"></div>
-        <button class="btn btn-accent" onclick="nextSlide()" id="btn-next">Berikutnya &#8594;</button>
-        <button class="btn btn-accent" onclick="showScreen('settings')" id="btn-mulai-materi" style="display:none;">Siap Berburu! &#9876;</button>
-      </div>
-      <div style="position:absolute; top:20px; right:20px;">
-        <button class="btn btn-outline" style="color:white; border-color:white; background:rgba(0,0,0,0.5);" onclick="showScreen('home')">X Tutup</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. CARA BERMAIN SCREEN -->
-  <section id="cara-bermain" class="screen">
-    <div class="panel-card" style="max-width: 1000px;">
-      <h2 class="slide-title">Panduan Petualangan</h2>
-      <div class="how-to-grid">
-        <div class="step-card"><div class="step-title">1. Persiapan</div><p>Pilih jumlah peti rahasia dan tingkat kesulitan yang akan menguji akhlakmu.</p></div>
-        <div class="step-card"><div class="step-title">2. Navigasi Arah</div><p>Pemain A (Kanan) & Pemain B (Kiri) menggunakan tombol arah (D-Pad) di layar atau Keyboard untuk bergerak.</p></div>
-        <div class="step-card"><div class="step-title">3. Klaim Peti</div><p>Dekati peti untuk menguncinya dari lawan. Panelmu akan memunculkan sebuah ujian (soal).</p></div>
-        <div class="step-card"><div class="step-title">4. Jawaban Benar</div><p>Jika benar, peti akan terbuka! Kamu mendapat koin/poin dan peti tersebut musnah.</p></div>
-        <div class="step-card"><div class="step-title">5. Jawaban Salah</div><p>Awas! Kamu akan terlempar, poin tidak bertambah, dan peti bisa direbut kembali.</p></div>
-        <div class="step-card"><div class="step-title">6. Penentuan Juara</div><p>Kumpulkan poin terbanyak sebelum 3 menit habis atau semua peti ditemukan!</p></div>
-      </div>
-      <div class="home-buttons">
-        <button class="btn btn-outline" onclick="showScreen('home')">Kembali</button>
-        <button class="btn btn-accent" onclick="showScreen('settings')">Lanjut Bermain</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4. SETTINGS & DIFFICULTY SCREEN -->
-  <section id="settings" class="screen">
-    <div class="settings-container">
-      
-      <!-- Amount Selection -->
-      <div class="setting-section">
-        <h2 class="setting-title">1. Berapa Peti yang Ingin Dicari?</h2>
-        <div class="count-options">
-          <button class="count-btn" id="btn-count-5" onclick="setChestCount(5)">5 Peti</button>
-          <button class="count-btn" id="btn-count-10" onclick="setChestCount(10)">10 Peti</button>
-          <button class="count-btn active" id="btn-count-20" onclick="setChestCount(20)">20 Peti</button>
-        </div>
-      </div>
-
-      <!-- Difficulty Selection -->
-      <div class="setting-section" style="background:transparent; border:none; box-shadow:none; padding:0;">
-        <h2 class="setting-title" style="margin-bottom:20px; font-size:2rem;">2. Pilih Tingkat Tantangan!</h2>
-        <div class="diff-cards">
-          <div class="diff-card mudah" onclick="startGame('mudah')">
-            <div class="diff-title">MUDAH</div>
-            <div class="diff-desc">Menguji pengetahuan dasar akhlak. <br><strong>10 Poin/Peti.</strong></div>
-          </div>
-          <div class="diff-card sedang" onclick="startGame('sedang')">
-            <div class="diff-title">SEDANG</div>
-            <div class="diff-desc">Skenario penerapan sehari-hari. <br><strong>20 Poin/Peti.</strong></div>
-          </div>
-          <div class="diff-card sulit" onclick="startGame('sulit')">
-            <div class="diff-title">SULIT</div>
-            <div class="diff-desc">Analisis situasi dan dilema sosial. <br><strong>30 Poin/Peti.</strong></div>
-          </div>
-        </div>
-      </div>
-
-      <button class="btn btn-outline" style="color:white; border-color:white; background:rgba(0,0,0,0.5);" onclick="showScreen('home')">Kembali ke Beranda</button>
-    </div>
-  </section>
-
-  <!-- 5. GAME ARENA -->
-  <section id="arena" class="screen">
-    <div class="arena-header">
-      <button class="btn btn-outline" style="color:white; border-color:white; padding: 8px 18px; font-size: 1rem;" onclick="confirmExit()">Keluar</button>
-      <div class="chest-counter">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="#F1C40F" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 16H4v-9h4v1c0 2.21 1.79 4 4 4s4-1.79 4-4v-1h4v9z"/></svg>
-        <span id="ui-chests">0/20</span>
-      </div>
-      <div class="timer" id="ui-timer">03:00</div>
-      <div style="font-weight:bold; color:var(--accent); font-size:1.2rem; text-shadow:0 2px 4px rgba(0,0,0,0.5);" id="ui-diff-label">SEDANG</div>
+<!-- 2. MATERI SCREEN -->
+<section id="materi" class="screen">
+  <div class="slidewrap">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <button class="btn" onclick="showScreen('home')" style="padding: 10px 18px; font-size:0.95rem;">← Beranda</button>
+      <button class="btn red" onclick="showScreen('home')" style="padding: 10px 18px; font-size:0.95rem;">X Tutup</button>
     </div>
     
-    <div class="arena-layout">
-      <!-- Player B Panel (Left) -->
-      <div class="player-panel" id="panel-b">
-        <div class="player-info">
-          <div class="avatar-thumb">B</div>
-          <div class="player-stats">
-            <h3 style="color:var(--player-b)">PLAYER B</h3>
-            <p><span>Skor:</span> <span id="score-b" style="color:var(--primary); font-size:1.1rem;">0</span></p>
-            <p><span>Peti:</span> <span id="chest-b">0</span></p>
-          </div>
-        </div>
-        <div class="qa-space" id="qa-b">
-          <div class="qa-idle">Jelajahi peta dan temukan peti harta karun!</div>
-        </div>
-        <div class="dpad-area">
-          <div class="dpad-container">
-            <div class="dpad-btn dpad-up" id="btn-b-up" onpointerdown="triggerMove('B', 0, -1, 'btn-b-up')">▲</div>
-            <div class="dpad-btn dpad-left" id="btn-b-left" onpointerdown="triggerMove('B', -1, 0, 'btn-b-left')">◀</div>
-            <div class="dpad-btn dpad-down" id="btn-b-down" onpointerdown="triggerMove('B', 0, 1, 'btn-b-down')">▼</div>
-            <div class="dpad-btn dpad-right" id="btn-b-right" onpointerdown="triggerMove('B', 1, 0, 'btn-b-right')">▶</div>
-          </div>
-          <div class="kbd-hint">Tombol Keyboard: W A S D</div>
-        </div>
-      </div>
-
-      <!-- Map Center -->
-      <div class="map-section">
-        <div class="map-container" id="map-grid">
-          <!-- Cells generated by JS -->
-          <div class="entity avatar-entity" id="avatar-b">
-            <div class="avatar-body">B</div>
-          </div>
-          <div class="entity avatar-entity" id="avatar-a">
-            <div class="avatar-body">A</div>
-          </div>
-          <!-- Chests generated by JS -->
-        </div>
-      </div>
-
-      <!-- Player A Panel (Right) -->
-      <div class="player-panel" id="panel-a">
-        <div class="player-info">
-          <div class="avatar-thumb">A</div>
-          <div class="player-stats">
-            <h3 style="color:var(--player-a)">PLAYER A</h3>
-            <p><span>Skor:</span> <span id="score-a" style="color:var(--primary); font-size:1.1rem;">0</span></p>
-            <p><span>Peti:</span> <span id="chest-a">0</span></p>
-          </div>
-        </div>
-        <div class="qa-space" id="qa-a">
-          <div class="qa-idle">Jelajahi peta dan temukan peti harta karun!</div>
-        </div>
-        <div class="dpad-area">
-          <div class="dpad-container">
-            <div class="dpad-btn dpad-up" id="btn-a-up" onpointerdown="triggerMove('A', 0, -1, 'btn-a-up')">▲</div>
-            <div class="dpad-btn dpad-left" id="btn-a-left" onpointerdown="triggerMove('A', -1, 0, 'btn-a-left')">◀</div>
-            <div class="dpad-btn dpad-down" id="btn-a-down" onpointerdown="triggerMove('A', 0, 1, 'btn-a-down')">▼</div>
-            <div class="dpad-btn dpad-right" id="btn-a-right" onpointerdown="triggerMove('A', 1, 0, 'btn-a-right')">▶</div>
-          </div>
-          <div class="kbd-hint">Tombol Keyboard: Arah Panah</div>
-        </div>
-      </div>
+    <div class="slide-content" id="slide-content">
+      <!-- Slides injected by JS -->
     </div>
-  </section>
+    
+    <div class="nav">
+      <button class="btn" onclick="prevSlide()" id="btn-prev">◀ Sebelumnya</button>
+      <div class="dots" id="slide-dots"></div>
+      <button class="btn gold" onclick="nextSlide()" id="btn-next">Berikutnya ▶</button>
+      <button class="btn red" onclick="showScreen('settings')" id="btn-mulai-materi" style="display:none;">Siap Berburu! ⚔</button>
+    </div>
+  </div>
+</section>
 
-  <!-- 6. RESULT SCREEN -->
-  <section id="result" class="screen">
-    <div class="panel-card" style="max-width: 850px; background: rgba(255,248,231,0.95); border: 5px solid var(--accent);">
-      <h1 class="result-title" id="res-title">PERTANDINGAN SELESAI</h1>
-      <p id="res-reason" style="margin-bottom: 25px; font-weight:bold; color:#555; font-size:1.2rem;">Waktu Habis!</p>
+<!-- 3. CARA BERMAIN SCREEN -->
+<section id="cara-bermain" class="screen">
+  <div class="panelc" style="max-width: 1000px; margin-top: 3vh;">
+    <h2 class="slide-title" style="text-align:center;">PAPAN PETUNJUK PETUALANGAN</h2>
+    <div class="how-to-grid">
+      <div class="step-card"><b>1</b><div class="step-title">Pilih Tantangan</div><p>Pilih tingkat kesulitan dan jumlah soal. Kedua pemain akan memakai pengaturan yang sama.</p></div>
+      <div class="step-card"><b>2</b><div class="step-title">Gerakkan Karakter</div><p>Gunakan tombol arah (D-Pad) di layar. Atau Keyboard: Player 1 (Kanan) pakai Panah, Player 2 (Kiri) pakai WASD.</p></div>
+      <div class="step-card"><b>3</b><div class="step-title">Temukan Peti</div><p>Jelajahi peta dan dekati peti harta karun. Jumlah peti sama dengan jumlah soal yang dipilih.</p></div>
+      <div class="step-card"><b>4</b><div class="step-title">Jawab Pertanyaan</div><p>Sentuh peti untuk menguncinya dari lawan. Panelmu akan menampilkan soal rahasia.</p></div>
+      <div class="step-card"><b>5</b><div class="step-title">Dapatkan Harta</div><p>Jawaban benar: Peti terbuka & dapat koin/poin. Jawaban salah: Avatar terpental & peti gagal dibuka.</p></div>
+      <div class="step-card"><b>6</b><div class="step-title">Kejar Kemenangan</div><p>Waktu maksimal 3 menit. Pemenang ditentukan oleh skor tertinggi, peti terbanyak, lalu akurasi!</p></div>
+    </div>
+    <div class="center" style="margin-top:20px;">
+      <button class="btn" onclick="showScreen('home')">Kembali ke Beranda</button>
+      <button class="btn gold" onclick="showScreen('settings')">Mulai Bermain</button>
+    </div>
+  </div>
+</section>
+
+<!-- 4. SETTINGS SCREEN (REFERENCE STYLE) -->
+<section id="settings" class="screen">
+  <div class="slidewrap">
+    <div style="margin-bottom: 15px;">
+      <button class="btn" onclick="showScreen('home')" style="padding: 10px 18px; font-size:0.95rem;">← Beranda</button>
+    </div>
+    <div class="panelc">
+      <h2 style="color:var(--primary-dark); font-size:2.2rem; text-align:center;">PILIH TANTANGANMU!</h2>
+      <p style="text-align:center; font-size:1.1rem; margin-top:8px;">Siapakah pemburu harta karun terbaik? Tentukan tingkat kesulitan dan jumlah peti, lalu kumpulkan poin sebanyak mungkin!</p>
       
-      <div class="stats-container">
-        <div class="stat-card" id="stat-b">
-          <div class="stat-name" style="color:var(--player-b)">PLAYER B</div>
-          <div class="stat-row"><span>Skor</span><strong id="r-score-b" style="color:var(--primary); font-size:1.4rem;">0</strong></div>
-          <div class="stat-row"><span>Peti Terbuka</span><strong id="r-chest-b">0</strong></div>
-          <div class="stat-row"><span>Benar / Salah</span><strong id="r-ans-b">0 / 0</strong></div>
-          <div class="stat-row"><span>Akurasi</span><strong id="r-acc-b">0%</strong></div>
+      <h3 style="margin-top:25px; border-bottom:2px solid #ddd; padding-bottom:5px;">A. Pilih Tingkat Kesulitan</h3>
+      <div class="opts3" id="diffs">
+        <div class="opt" data-diff="mudah" onclick="setDiff('mudah')">
+          <h3><svg viewBox="0 0 24 24" fill="#10a37f"><path d="M12 3c-5 4-7 8-7 12a7 7 0 0 0 14 0c0-4-2-8-7-12z"/></svg> MUDAH</h3>
+          <p>Menguji pengetahuan dasar akhlak.</p>
+          <ul><li>Soal sederhana</li><li>Mengenal perilaku terpuji</li><li><b>10 Poin / Peti</b></li></ul>
         </div>
-        <div class="stat-card" id="stat-a">
-          <div class="stat-name" style="color:var(--player-a)">PLAYER A</div>
-          <div class="stat-row"><span>Skor</span><strong id="r-score-a" style="color:var(--primary); font-size:1.4rem;">0</strong></div>
-          <div class="stat-row"><span>Peti Terbuka</span><strong id="r-chest-a">0</strong></div>
-          <div class="stat-row"><span>Benar / Salah</span><strong id="r-ans-a">0 / 0</strong></div>
-          <div class="stat-row"><span>Akurasi</span><strong id="r-acc-a">0%</strong></div>
+        <div class="opt" data-diff="sedang" onclick="setDiff('sedang')">
+          <h3><svg viewBox="0 0 24 24" fill="#e08a00"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></svg> SEDANG</h3>
+          <p>Penerapan nilai dalam kehidupan.</p>
+          <ul><li>Skenario nyata</li><li>Memilih tindakan tepat</li><li><b>20 Poin / Peti</b></li></ul>
+        </div>
+        <div class="opt" data-diff="sulit" onclick="setDiff('sulit')">
+          <h3><svg viewBox="0 0 24 24" fill="#d6482a"><path d="M12 2l2.6 6.4L21 9l-5 4.2L17.5 20 12 16.5 6.5 20 8 13.2 3 9l6.4-.6z"/></svg> SULIT</h3>
+          <p>Menganalisis situasi & keputusan.</p>
+          <ul><li>Studi kasus & penalaran</li><li>Keadilan & dilema sosial</li><li><b>30 Poin / Peti</b></li></ul>
         </div>
       </div>
       
-      <div class="home-buttons">
-        <button class="btn btn-outline" onclick="showScreen('home')">Ke Beranda</button>
-        <button class="btn btn-accent" onclick="showScreen('settings')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg> Main Lagi
-        </button>
+      <h3 style="margin-top:15px; border-bottom:2px solid #ddd; padding-bottom:5px;">B. Berapa Jumlah Peti (Soal)?</h3>
+      <div class="opts3" id="counts">
+        <div class="opt" data-count="5" onclick="setCount(5)">
+          <h3>5 PETI</h3><p>Tantangan Singkat</p><ul><li>5 Soal dari bank soal</li><li>Permainan cepat</li></ul>
+        </div>
+        <div class="opt" data-count="10" onclick="setCount(10)">
+          <h3>10 PETI</h3><p>Petualangan Sedang</p><ul><li>10 Soal dari bank soal</li><li>Cukup menguji tangkas</li></ul>
+        </div>
+        <div class="opt" data-count="20" onclick="setCount(20)">
+          <h3>20 PETI</h3><p>Petualangan Penuh</p><ul><li>20 Soal dari bank soal</li><li>Ujian sesungguhnya</li></ul>
+        </div>
+      </div>
+      
+      <div class="sum" id="cfgSum">Pilih satu tingkat kesulitan dan satu jumlah soal.</div>
+      
+      <div class="center" style="margin-top: 15px;">
+        <button class="btn gold" id="startBtn" style="font-size:1.3rem; padding: 16px 30px;" disabled onclick="initAndStartGame()">MULAI PERTANDINGAN ⚔</button>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-</div>
+<!-- 5. GAME ARENA -->
+<section id="arena" class="screen">
+  <div class="gh">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <b>MISI ADAB BERTETANGGA</b>
+      <span id="ui-diff-label" style="background:rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 8px; font-size:0.9rem;"></span>
+    </div>
+    <div class="tm" id="ui-timer">03:00</div>
+    <div style="display:flex; align-items:center; gap:15px;">
+      <span id="ui-chests" style="font-size:1.1rem; color:var(--accent);">Terbuka: 0 • Sisa: 0</span>
+      <button class="btn red" style="padding:8px 16px; font-size:0.95rem;" onclick="confirmExit()">Keluar</button>
+    </div>
+  </div>
+  
+  <div class="arena-layout">
+    <!-- Player B Panel (Kiri - Orange) -->
+    <div class="panel" id="panel-b">
+      <div class="ph">
+        <div id="av-b-ui"></div>
+        <h3>Player 2 (WASD)</h3>
+        <span class="sc" id="score-b">0</span>
+      </div>
+      <div class="stats" id="st-b">
+        <div><b id="stat-open-b">0</b>Peti</div>
+        <div><b id="stat-ok-b" style="color:var(--secondary);">0</b>Benar</div>
+        <div><b id="stat-bad-b" style="color:var(--danger);">0</b>Salah</div>
+        <div><b id="stat-acc-b">0%</b>Akurasi</div>
+      </div>
+      <div class="qbox" id="qa-b">
+        <div class="idle">Jelajahi peta dan temukan peti harta karun!</div>
+      </div>
+      <div class="note" id="note-b"></div>
+      <div class="dpad-area">
+        <div class="dpad" id="dp-b">
+          <!-- Buttons injected by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Center -->
+    <div class="mapwrap">
+      <div class="map-container" id="map-grid">
+        <div class="grid" id="grid-bg"></div>
+        <div class="layer" id="layer">
+          <!-- Avatars and Chests injected here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Player A Panel (Kanan - Cyan) -->
+    <div class="panel" id="panel-a">
+      <div class="ph">
+        <div id="av-a-ui"></div>
+        <h3>Player 1 (Panah)</h3>
+        <span class="sc" id="score-a">0</span>
+      </div>
+      <div class="stats" id="st-a">
+        <div><b id="stat-open-a">0</b>Peti</div>
+        <div><b id="stat-ok-a" style="color:var(--secondary);">0</b>Benar</div>
+        <div><b id="stat-bad-a" style="color:var(--danger);">0</b>Salah</div>
+        <div><b id="stat-acc-a">0%</b>Akurasi</div>
+      </div>
+      <div class="qbox" id="qa-a">
+        <div class="idle">Jelajahi peta dan temukan peti harta karun!</div>
+      </div>
+      <div class="note" id="note-a"></div>
+      <div class="dpad-area">
+        <div class="dpad" id="dp-a">
+          <!-- Buttons injected by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. RESULT SCREEN -->
+<section id="result" class="screen">
+  <div class="res">
+    <h1 id="res-title">PERTANDINGAN SELESAI</h1>
+    <div class="rs">
+      <!-- Card B (Left) -->
+      <div class="rc" id="res-card-b" style="--c: var(--player-b)">
+        <div id="res-av-b"></div>
+        <h3 style="text-align:center; font-size:1.8rem; margin-bottom:15px; color:var(--text-dark);">Player 2 <span id="crown-b"></span></h3>
+        <table>
+          <tr><td>Skor Akhir</td><td id="r-score-b">0</td></tr>
+          <tr><td>Peti Dibuka</td><td id="r-chest-b">0</td></tr>
+          <tr><td>Jawaban Benar</td><td id="r-ok-b">0</td></tr>
+          <tr><td>Jawaban Salah</td><td id="r-bad-b">0</td></tr>
+          <tr><td>Akurasi</td><td id="r-acc-b">0%</td></tr>
+        </table>
+      </div>
+      <!-- Card A (Right) -->
+      <div class="rc" id="res-card-a" style="--c: var(--player-a)">
+        <div id="res-av-a"></div>
+        <h3 style="text-align:center; font-size:1.8rem; margin-bottom:15px; color:var(--text-dark);">Player 1 <span id="crown-a"></span></h3>
+        <table>
+          <tr><td>Skor Akhir</td><td id="r-score-a">0</td></tr>
+          <tr><td>Peti Dibuka</td><td id="r-chest-a">0</td></tr>
+          <tr><td>Jawaban Benar</td><td id="r-ok-a">0</td></tr>
+          <tr><td>Jawaban Salah</td><td id="r-bad-a">0</td></tr>
+          <tr><td>Akurasi</td><td id="r-acc-a">0%</td></tr>
+        </table>
+      </div>
+    </div>
+    
+    <div class="sum" id="res-reason" style="margin-bottom:25px; display:inline-block;">Waktu Habis!</div>
+    
+    <div class="center">
+      <button class="btn gold" onclick="showScreen('settings')" style="margin:5px;">MAIN LAGI</button>
+      <button class="btn" onclick="showScreen('home')" style="margin:5px;">KEMBALI KE BERANDA</button>
+    </div>
+  </div>
+</section>
 
 <script>
 /* ==========================================================================
-   STATE AND CONFIGURATION
+   UTILITIES & SVGS
    ========================================================================== */
-const MAP_SIZE = 9;
-const TIME_LIMIT = 180; // detik
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
-let activeTotalChests = 20; // Default terpilih
+// Avatar Generator (From Reference)
+const AV = (c, d) => `<svg viewBox="0 0 40 48" style="width:100%;height:100%;"><ellipse cx="20" cy="45" rx="11" ry="2.5" fill="#0003"/><rect x="11" y="24" width="18" height="19" rx="6" fill="${c}"/><rect x="11" y="33" width="18" height="3" fill="#f5b82e"/><rect x="8" y="26" width="5" height="12" rx="2.5" fill="${c}"/><rect x="27" y="26" width="5" height="12" rx="2.5" fill="${c}"/><circle cx="20" cy="17" r="9" fill="#ffd9b0"/><path d="M9 15Q20 1 31 15z" fill="${d}"/><rect x="7" y="14" width="26" height="3" rx="1.5" fill="${d}"/><circle cx="20" cy="7" r="1.8" fill="#f5b82e"/><circle cx="16.5" cy="19.5" r="1.2" fill="#12284a"/><circle cx="23.5" cy="19.5" r="1.2" fill="#12284a"/><path d="M16.5 23Q20 26 23.5 23" stroke="#12284a" fill="none" stroke-width="1.2" stroke-linecap="round"/></svg>`;
 
-let state = {
-  screen: 'home', slideIdx: 0, difficulty: 'mudah', timer: 0, interval: null, playing: false,
-  chestsOpened: 0,
-  players: {
-    A: { id: 'A', x: 8, y: 8, score: 0, chests: 0, correct: 0, wrong: 0, state: 'idle', activeChest: null, qId: null },
-    B: { id: 'B', x: 0, y: 0, score: 0, chests: 0, correct: 0, wrong: 0, state: 'idle', activeChest: null, qId: null }
-  },
-  chests: [], 
-  usedQuestions: []
-};
+// Chest Generator (From Reference)
+const CHEST = `<svg viewBox="0 0 40 40" style="width:100%;height:100%;"><ellipse cx="20" cy="36" rx="14" ry="3" fill="#0003"/><rect x="5" y="18" width="30" height="17" rx="3" fill="#a8631f"/><rect x="5" y="18" width="30" height="4" fill="#8a4f15"/><rect x="9" y="18" width="3" height="17" fill="#f5b82e"/><rect x="28" y="18" width="3" height="17" fill="#f5b82e"/><g class="lid"><path d="M5 18Q5 6 20 6Q35 6 35 18z" fill="#c97a28"/><path d="M8 15Q10 9 20 9" stroke="#e8a653" stroke-width="2" fill="none"/><rect x="9" y="8" width="3" height="10" fill="#f5b82e"/><rect x="28" y="8" width="3" height="10" fill="#f5b82e"/></g><rect x="16.5" y="19" width="7" height="8" rx="1.5" fill="#ffe08a" stroke="#a35f00"/><circle cx="20" cy="22.5" r="1.3" fill="#a35f00"/></svg>`;
 
-// Input states keyboard
-const keys = { w:false, a:false, s:false, d:false, ArrowUp:false, ArrowLeft:false, ArrowDown:false, ArrowRight:false };
-let lastMoveTime = { A: 0, B: 0 };
-const MOVE_COOLDOWN = 180; // ms
+const SVGA = AV('#12b5c9', '#0a6f7c'); // Player 1 (Cyan)
+const SVGB = AV('#ff7a45', '#b3441a'); // Player 2 (Orange)
+const ARR = '<svg viewBox="0 0 24 24"><path d="M12 4l9 12H3z"/></svg>';
 
 /* ==========================================================================
-   MATERIAL SLIDES (Tetap Lengkap)
+   MATERIAL SLIDES
    ========================================================================== */
 const slidesData = [
-  { title: "Apa yang Akan Kita Pelajari?", content: "<div style='text-align:center'><h3>Misi Adab Bertetangga</h3><br><p>Tujuan Belajar:</p></div><ul><li>Menjelaskan pentingnya menjaga hubungan baik dengan tetangga.</li><li>Mengidentifikasi contoh akhlak terpuji kepada tetangga Muslim dan non-Muslim.</li><li>Membedakan perilaku baik dan perilaku yang menyakiti tetangga.</li><li>Menentukan tindakan yang tepat saat ada perselisihan.</li><li>Menerapkan nilai keadilan dan saling menghormati dalam kehidupan.</li></ul>" },
-  { title: "Siapakah Tetangga Kita?", content: "<p>Tetangga adalah orang yang tempat tinggalnya berdekatan dengan kita.</p><br><div style='background:#fdf2e9; padding:15px; border-radius:10px;'><strong>Siapa saja mereka?</strong><ul><li>Keluarga di sebelah, depan, atau belakang rumah kita.</li><li>Warga di lingkungan RT/RW tempat kita tinggal.</li><li>Mereka bisa jadi memiliki agama, suku, atau kebiasaan yang berbeda dengan kita.</li></ul></div>" },
-  { title: "Islam Mengajarkan Kebaikan", content: "<p>Islam sangat menekankan pentingnya berbuat baik kepada tetangga.</p><br><ul><li><strong>QS. An-Nisa ayat 36:</strong> Allah memerintahkan kita berbuat baik kepada tetangga yang dekat maupun yang jauh.</li><li><strong>Hadis Nabi:</strong> <em>\"Barang siapa yang beriman kepada Allah dan hari akhir, maka hendaklah ia memuliakan tetangganya.\"</em> (HR. Bukhari & Muslim)</li></ul><p>Akhlak baik kepada tetangga adalah bukti keimanan seorang Muslim.</p>" },
-  { title: "Hak Tetangga yang Harus Dijaga", content: "<p>Setiap tetangga memiliki hak untuk:</p><ul><li>Mendapatkan keamanan dan tidak diganggu (misalnya dari suara bising).</li><li>Mendapatkan lingkungan yang bersih (tidak membuang sampah ke halamannya).</li><li>Dihormati privasi dan barang miliknya.</li><li>Mendapat bantuan saat mengalami musibah atau kesulitan.</li><li>Menerima perlakuan dan perkataan yang santun.</li></ul>" },
-  { title: "Akhlak kepada Tetangga Muslim", content: "<p>Contoh sikap terpuji kepada sesama Muslim:</p><ul><li>Mengucapkan salam dan menjalin silaturahmi.</li><li>Menjenguk ketika mereka sakit.</li><li>Berbagi makanan jika kita memiliki kelebihan.</li><li>Mendoakan kebaikan untuk mereka.</li><li>Saling mengingatkan dalam kebaikan dengan cara yang sopan.</li><li>Meminta maaf dengan ikhlas jika melakukan kesalahan.</li></ul>" },
-  { title: "Akhlak kepada Tetangga Non-Muslim", content: "<p>Perbedaan agama <strong>bukanlah alasan</strong> untuk berbuat buruk. Kita tetap harus:</p><ul><li>Menyapa dan berbicara dengan sopan santun.</li><li>Membantu urusan kemanusiaan ketika mereka tertimpa musibah.</li><li>Menjaga kebersihan dan keamanan lingkungan bersama.</li><li>Menghormati perbedaan keyakinan tanpa mengejeknya.</li><li>Tidak memaksakan ajaran agama kita kepada mereka.</li></ul>" },
-  { title: "Apa yang Sama dan Perlu Dihormati?", content: "<div style='display:flex; gap:10px; font-size:1rem;'><div style='flex:1; background:#e8f8f5; padding:10px; border-radius:8px;'><strong>Tetangga Muslim</strong><br>Saling mendoakan, silaturahmi erat, tolong-menolong, saling menghargai.</div><div style='flex:1; background:#fef9e7; padding:10px; border-radius:8px;'><strong>Tetangga Non-Muslim</strong><br>Santun, adil, peduli musibah, menghormati keyakinan berbeda.</div></div><br><p style='text-align:center; font-weight:bold;'>Persamaannya:</p><p style='text-align:center'>Sama-sama tidak boleh disakiti, berhak atas keamanan, perlu dihargai, dan diperlakukan dengan adil.</p>" },
-  { title: "Perilaku Terpuji vs Harus Dihindari", content: "<div style='display:flex; gap:10px; font-size:1rem;'><div style='flex:1; border:2px solid #2ecc71; padding:10px; border-radius:8px;'><strong>👍 Terpuji</strong><ul><li>Berbagi makanan</li><li>Menjaga kebersihan</li><li>Menjenguk yang sakit</li><li>Bicara sopan</li></ul></div><div style='flex:1; border:2px solid #e74c3c; padding:10px; border-radius:8px;'><strong>👎 Dihindari</strong><ul><li>Membunyikan TV sangat keras</li><li>Membuang sampah sembarangan</li><li>Mengejek agama lain</li><li>Mengambil barang tanpa izin</li></ul></div></div>" },
-  { title: "Contoh dalam Keseharian", content: "<ul><li><strong>Situasi:</strong> Bola masuk halaman tetangga.<br><strong>Tindakan:</strong> Ketuk pintu, minta maaf, dan minta izin mengambilnya. Jangan menerobos masuk.</li><li><strong>Situasi:</strong> Ada kegiatan agama berbeda di lingkungan.<br><strong>Tindakan:</strong> Tetap tenang, tidak ikut campur urusan ibadahnya, tapi tidak mengganggu atau mengejek.</li><li><strong>Situasi:</strong> Tetangga kesulitan angkat barang.<br><strong>Tindakan:</strong> Segera tawarkan bantuan semampu kita.</li></ul>" },
-  { title: "Jika Terjadi Perselisihan", content: "<p>Langkah penyelesaian masalah yang baik:</p><ol><li>Tenangkan diri, jangan langsung marah atau membalas.</li><li>Dengarkan penjelasan dari pihak tetangga.</li><li>Sampaikan masalah dengan bahasa yang sopan dan tidak membentak.</li><li>Berani meminta maaf jika kitalah yang bersalah.</li><li>Cari solusi bersama demi kerukunan.</li><li>Minta bantuan orang dewasa (RT/RW) jika sulit diselesaikan sendiri.</li></ol>" },
-  { title: "Menghormati Perbedaan dengan Tepat", content: "<p>Menghormati perbedaan keyakinan <strong>tidak berarti</strong> kita harus mengikuti keyakinan atau ibadah mereka.</p><br><p>Toleransi yang benar dalam Islam:</p><ul><li>Teguh pada aqidah dan ibadah sendiri.</li><li>Membiarkan tetangga beribadah sesuai agamanya tanpa diganggu.</li><li>Tetap bekerja sama dalam urusan dunia seperti gotong royong, ronda, dan kebersihan.</li><li>Berlaku adil dan tidak curang kepada mereka.</li></ul>" },
-  { title: "Ayo Analisis Situasi!", content: "<p>Coba pikirkan tindakan terbaik untuk kasus ini:</p><div style='font-size:1rem; background:#f4f6f6; padding:10px; margin-bottom:10px; border-left:4px solid var(--accent);'><strong>Kasus:</strong> Temanmu mengejek cara ibadah tetanggamu yang non-Muslim.</div><p><em>Jawaban:</em> Tegur temanmu dengan baik. Jelaskan bahwa Islam melarang kita menghina atau mengejek keyakinan orang lain, karena itu bisa menimbulkan permusuhan.</p>" },
-  { title: "Rangkuman", content: "<h3 style='text-align:center; color:var(--primary);'>Jadilah Tetangga yang Baik!</h3><br><ul><li>Selalu bersikap <strong>santun</strong> dan ramah.</li><li><strong>Bantu</strong> sesuai kemampuan.</li><li>Jaga <strong>keamanan</strong> dan <strong>kenyamanan</strong> bersama.</li><li><strong>Hormati</strong> perbedaan yang ada.</li><li>Berlaku <strong>adil</strong> tanpa pandang bulu.</li><li>Jauhi perilaku yang <strong>merugikan</strong> atau menyakiti hati tetangga.</li></ul><p style='text-align:center; margin-top:20px; font-weight:bold;'>Siap menguji pengetahuanmu? Lanjutkan ke pengaturan!</p>" }
+  { title: "Apa yang Akan Kita Pelajari?", content: "<ul><li>Menjelaskan pentingnya menjaga hubungan baik dengan tetangga.</li><li>Mengidentifikasi contoh akhlak terpuji kepada tetangga Muslim dan non-Muslim.</li><li>Membedakan perilaku baik dan perilaku yang menyakiti tetangga.</li><li>Menentukan tindakan yang tepat saat ada perselisihan.</li><li>Menerapkan nilai keadilan dan saling menghormati.</li></ul>" },
+  { title: "Siapakah Tetangga Kita?", content: "<p>Tetangga adalah orang yang tempat tinggalnya berdekatan dengan kita.</p><br><div style='background:rgba(245,184,46,0.2); padding:15px; border-radius:10px;'><strong>Siapa saja mereka?</strong><ul><li>Keluarga di sebelah, depan, atau belakang rumah.</li><li>Warga di lingkungan RT/RW tempat kita tinggal.</li><li>Mereka bisa jadi memiliki agama, suku, atau kebiasaan yang berbeda.</li></ul></div>" },
+  { title: "Islam Mengajarkan Kebaikan", content: "<ul><li><strong>QS. An-Nisa ayat 36:</strong> Allah memerintahkan kita berbuat baik kepada tetangga yang dekat maupun yang jauh.</li><li><strong>Hadis Nabi:</strong> <em>\"Barang siapa yang beriman kepada Allah dan hari akhir, maka hendaklah ia memuliakan tetangganya.\"</em> (HR. Bukhari & Muslim)</li></ul><p>Akhlak baik kepada tetangga adalah bukti keimanan seorang Muslim.</p>" },
+  { title: "Hak Tetangga yang Harus Dijaga", content: "<ul><li>Mendapatkan keamanan dan tidak diganggu (misalnya dari suara bising).</li><li>Mendapatkan lingkungan yang bersih (tidak membuang sampah sembarangan).</li><li>Dihormati privasi dan barang miliknya.</li><li>Mendapat bantuan saat mengalami musibah atau kesulitan.</li><li>Menerima perlakuan dan perkataan yang santun.</li></ul>" },
+  { title: "Akhlak kepada Tetangga Muslim", content: "<ul><li>Mengucapkan salam dan menjalin silaturahmi.</li><li>Menjenguk ketika mereka sakit.</li><li>Berbagi makanan jika kita memiliki kelebihan.</li><li>Mendoakan kebaikan untuk mereka.</li><li>Meminta maaf dengan ikhlas jika melakukan kesalahan.</li></ul>" },
+  { title: "Akhlak kepada Tetangga Non-Muslim", content: "<p>Perbedaan agama <strong>bukanlah alasan</strong> untuk berbuat buruk. Kita tetap harus:</p><ul><li>Menyapa dan berbicara dengan sopan santun.</li><li>Membantu urusan kemanusiaan ketika mereka tertimpa musibah.</li><li>Menghormati perbedaan keyakinan tanpa mengejeknya.</li><li>Tidak memaksakan ajaran agama kita kepada mereka.</li></ul>" },
+  { title: "Apa yang Sama dan Perlu Dihormati?", content: "<div style='display:flex; gap:10px; font-size:1rem;'><div style='flex:1; background:#e8f8f5; padding:10px; border-radius:8px;'><strong>Tetangga Muslim</strong><br>Saling mendoakan, tolong-menolong, saling menghargai.</div><div style='flex:1; background:#fef9e7; padding:10px; border-radius:8px;'><strong>Tetangga Non-Muslim</strong><br>Santun, adil, peduli musibah, menghormati keyakinan.</div></div><br><p style='text-align:center; font-weight:bold;'>Persamaannya:</p><p style='text-align:center'>Sama-sama tidak boleh disakiti, berhak atas keamanan, dan diperlakukan dengan adil.</p>" },
+  { title: "Perilaku Terpuji vs Harus Dihindari", content: "<div style='display:flex; gap:10px; font-size:1rem;'><div style='flex:1; border:3px solid var(--secondary); padding:10px; border-radius:8px;'><strong>👍 Terpuji</strong><ul><li>Berbagi makanan</li><li>Menjaga kebersihan</li><li>Menjenguk yang sakit</li></ul></div><div style='flex:1; border:3px solid var(--danger); padding:10px; border-radius:8px;'><strong>👎 Dihindari</strong><ul><li>Membunyikan TV keras</li><li>Membuang sampah sembarangan</li><li>Mengejek agama lain</li></ul></div></div>" },
+  { title: "Contoh dalam Keseharian", content: "<ul><li><strong>Situasi:</strong> Bola masuk halaman tetangga.<br><strong>Tindakan:</strong> Ketuk pintu, minta maaf, dan minta izin mengambilnya. Jangan menerobos.</li><li><strong>Situasi:</strong> Ada kegiatan agama berbeda di lingkungan.<br><strong>Tindakan:</strong> Tetap tenang, tidak ikut campur ritualnya, tapi tidak mengganggu.</li><li><strong>Situasi:</strong> Tetangga kesulitan angkat barang.<br><strong>Tindakan:</strong> Tawarkan bantuan semampu kita.</li></ul>" },
+  { title: "Jika Terjadi Perselisihan", content: "<ol><li>Tenangkan diri, jangan langsung marah atau membalas.</li><li>Dengarkan penjelasan dari pihak tetangga.</li><li>Sampaikan masalah dengan bahasa yang sopan.</li><li>Berani meminta maaf jika kitalah yang bersalah.</li><li>Cari solusi bersama demi kerukunan.</li><li>Minta bantuan orang dewasa (RT/RW) jika sulit diselesaikan.</li></ol>" },
+  { title: "Menghormati Perbedaan dengan Tepat", content: "<p>Toleransi yang benar dalam Islam:</p><ul><li>Teguh pada aqidah dan ibadah sendiri.</li><li>Membiarkan tetangga beribadah sesuai agamanya tanpa diganggu.</li><li>Tetap bekerja sama dalam urusan dunia seperti gotong royong dan kebersihan.</li><li>Berlaku adil dan tidak curang kepada mereka.</li></ul>" },
+  { title: "Ayo Analisis Situasi!", content: "<div style='font-size:1rem; background:#f4f6f6; padding:15px; border-radius:10px; border-left:5px solid var(--accent);'><strong>Kasus:</strong> Temanmu mengejek cara ibadah tetanggamu yang non-Muslim. Apa yang harus kamu lakukan?</div><br><p><em>Jawaban:</em> Tegur temanmu dengan baik. Jelaskan bahwa Islam melarang kita menghina atau mengejek keyakinan orang lain, karena itu bisa menimbulkan permusuhan.</p>" },
+  { title: "Rangkuman", content: "<h3 style='text-align:center; color:var(--primary);'>Jadilah Tetangga yang Baik!</h3><br><ul><li>Selalu bersikap <strong>santun</strong> dan ramah.</li><li><strong>Bantu</strong> sesuai kemampuan.</li><li>Jaga <strong>keamanan</strong> dan <strong>kenyamanan</strong> bersama.</li><li><strong>Hormati</strong> perbedaan yang ada dan berlaku <strong>adil</strong>.</li></ul><p style='text-align:center; margin-top:20px; font-weight:bold;'>Siap menguji pengetahuanmu? Lanjutkan ke pengaturan!</p>" }
 ];
 
 /* ==========================================================================
-   QUESTION DATABASE (Tepat 60 Soal, 20 per Kategori)
-   M: Mudah, S: Sedang, H: Sulit | Type: tf (B/S), mc (PG), ms (PGK)
+   QUESTION DATABASE (Tepat 60 Soal)
    ========================================================================== */
 const db = {
   mudah: [
@@ -585,241 +602,267 @@ const db = {
 };
 
 /* ==========================================================================
-   GAME ENGINE & CORE LOGIC
+   GAME STATE & LOGIC
    ========================================================================== */
-function getEle(id) { return document.getElementById(id); }
+const MAP_SIZES = { 5: 7, 10: 9, 20: 11 };
+const TIME_LIMIT = 180; // seconds
+const PTS = { mudah: 10, sedang: 20, sulit: 30 };
+const LV_NAME = { mudah: 'MUDAH', sedang: 'SEDANG', sulit: 'SULIT' };
 
-// UI Initialization
+let state = {
+  screen: 'home', slideIdx: 0, 
+  selDiff: null, selCount: null,
+  playing: false, timer: 0, interval: null, chestsOpened: 0,
+  players: {
+    A: { id: 'A', x: 8, y: 8, score: 0, chests: 0, ok: 0, bad: 0, state: 'idle', activeChest: null, qId: null }, // Kanan
+    B: { id: 'B', x: 0, y: 0, score: 0, chests: 0, ok: 0, bad: 0, state: 'idle', activeChest: null, qId: null }  // Kiri
+  },
+  chests: [], 
+  usedQuestions: []
+};
+
+// Input states
+const keys = { w:false, a:false, s:false, d:false, ArrowUp:false, ArrowLeft:false, ArrowDown:false, ArrowRight:false };
+let lastMoveTime = { A: 0, B: 0 };
+const MOVE_COOLDOWN = 160; // ms
+
+// Notification timeouts
+let noteTimeouts = { A: null, B: null };
+
+/* --- NAVIGATION & INIT --- */
 function init() {
-  renderSlides();
-  showScreen('home');
-  setupKeyboard();
   generateParticles();
-}
-
-function showScreen(screenId) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  getEle(screenId).classList.add('active');
-  state.screen = screenId;
   
-  if (screenId === 'materi') { state.slideIdx = 0; updateSlideUI(); }
-  if (screenId === 'home' || screenId === 'settings') {
-    if(state.playing) resetGame();
-  }
+  // Inject SVGs to Home
+  $('#homeStage').innerHTML = `<div class="big">${SVGB}</div><div class="chestbig">${CHEST}<span class="coin" style="left:-10px;top:10px"></span><span class="coin" style="right:-8px;top:30px;animation-delay:.6s"></span></div><div class="big">${SVGA}</div>`;
+  
+  // Inject SVGs to Panels & Results
+  $('#av-b-ui').innerHTML = SVGB; $('#av-a-ui').innerHTML = SVGA;
+  $('#res-av-b').innerHTML = SVGB; $('#res-av-a').innerHTML = SVGA;
+  
+  // Setup D-Pads
+  ['a', 'b'].forEach(p => {
+    const isA = p === 'a'; // A=Kanan (Arrow), B=Kiri (WASD)
+    $(`#dp-${p}`).innerHTML = ['u','l','r','d'].map(d => {
+      let dx=0, dy=0;
+      if(d==='u') dy=-1; if(d==='d') dy=1; if(d==='l') dx=-1; if(d==='r') dx=1;
+      return `<button class="dp" data-d="${d}" onpointerdown="triggerMove('${p.toUpperCase()}', ${dx}, ${dy}, this)">${ARR}</button>`;
+    }).join('') + '<div class="dmid">★</div>';
+  });
+
+  renderSlides();
+  setupKeyboard();
+  showScreen('home');
 }
 
-// Particle Background
+function showScreen(id) {
+  if (state.playing && id !== 'arena' && id !== 'result') stopGame();
+  $$('.screen').forEach(s => s.classList.remove('active'));
+  $(`#${id}`).classList.add('active');
+  state.screen = id;
+  window.scrollTo(0,0);
+  
+  if (id === 'materi') { state.slideIdx = 0; updateSlideUI(); }
+  if (id === 'settings') updateConfigUI();
+}
+
 function generateParticles() {
-  const container = getEle('particles');
-  container.innerHTML = '';
-  for(let i=0; i<35; i++) {
+  const c = $('#particles'); c.innerHTML = '';
+  for(let i=0; i<30; i++) {
     const p = document.createElement('div');
     p.style.position = 'absolute';
     p.style.width = Math.random() * 4 + 2 + 'px';
     p.style.height = p.style.width;
-    p.style.background = 'rgba(241, 196, 15, 0.5)';
+    p.style.background = 'rgba(255, 255, 255, 0.2)';
     p.style.borderRadius = '50%';
     p.style.left = Math.random() * 100 + 'vw';
     p.style.top = Math.random() * 100 + 'vh';
-    p.style.boxShadow = '0 0 5px rgba(241, 196, 15, 0.8)';
-    p.style.animation = `titleMystery ${Math.random() * 3 + 2}s infinite alternate`;
-    container.appendChild(p);
+    p.style.animation = `up ${Math.random() * 4 + 2}s infinite alternate ease-in-out`;
+    c.appendChild(p);
   }
 }
 
 /* --- MATERIAL SLIDES --- */
 function renderSlides() {
-  const c = getEle('slide-content');
-  const dots = getEle('slide-dots');
+  const c = $('#slide-content'), dots = $('#slide-dots');
   c.innerHTML = ''; dots.innerHTML = '';
   slidesData.forEach((s, i) => {
     c.innerHTML += `<div class="slide-card ${i===0?'active':''}" id="slide-${i}">
-      <h2 class="slide-title">${s.title}</h2>
-      <div class="slide-body">${s.content}</div>
-    </div>`;
+      <h2 class="slide-title">${i+1}. ${s.title}</h2><div class="slide-body">${s.content}</div></div>`;
     dots.innerHTML += `<div class="dot ${i===0?'active':''}" onclick="goToSlide(${i})"></div>`;
   });
 }
-
 function updateSlideUI() {
-  document.querySelectorAll('.slide-card').forEach((s, i) => {
-    s.classList.toggle('active', i === state.slideIdx);
-  });
-  document.querySelectorAll('.dot').forEach((d, i) => {
-    d.classList.toggle('active', i === state.slideIdx);
-  });
-  getEle('btn-prev').style.visibility = state.slideIdx === 0 ? 'hidden' : 'visible';
+  $$('.slide-card').forEach((s, i) => s.classList.toggle('active', i === state.slideIdx));
+  $$('.dot').forEach((d, i) => d.classList.toggle('active', i === state.slideIdx));
+  $('#btn-prev').style.visibility = state.slideIdx === 0 ? 'hidden' : 'visible';
   if (state.slideIdx === slidesData.length - 1) {
-    getEle('btn-next').style.display = 'none';
-    getEle('btn-mulai-materi').style.display = 'block';
+    $('#btn-next').style.display = 'none'; $('#btn-mulai-materi').style.display = 'block';
   } else {
-    getEle('btn-next').style.display = 'block';
-    getEle('btn-mulai-materi').style.display = 'none';
+    $('#btn-next').style.display = 'block'; $('#btn-mulai-materi').style.display = 'none';
   }
 }
 function nextSlide() { if(state.slideIdx < slidesData.length-1) { state.slideIdx++; updateSlideUI(); } }
 function prevSlide() { if(state.slideIdx > 0) { state.slideIdx--; updateSlideUI(); } }
 function goToSlide(i) { state.slideIdx = i; updateSlideUI(); }
 
-/* --- GAME SETTINGS --- */
-function setChestCount(num) {
-  activeTotalChests = num;
-  document.querySelectorAll('.count-btn').forEach(b => b.classList.remove('active'));
-  getEle(`btn-count-${num}`).classList.add('active');
+/* --- SETTINGS --- */
+function setDiff(d) { state.selDiff = d; updateConfigUI(); }
+function setCount(c) { state.selCount = c; updateConfigUI(); }
+function updateConfigUI() {
+  $$('#diffs .opt').forEach(b => b.classList.toggle('sel', b.dataset.diff === state.selDiff));
+  $$('#counts .opt').forEach(b => b.classList.toggle('sel', parseInt(b.dataset.count) === state.selCount));
+  
+  const ok = state.selDiff && state.selCount;
+  $('#startBtn').disabled = !ok;
+  
+  const df = state.selDiff ? LV_NAME[state.selDiff] : 'Belum dipilih';
+  const ct = state.selCount ? state.selCount : 'Belum dipilih';
+  $('#cfgSum').innerHTML = ok 
+    ? `Tingkat kesulitan: <b>${df}</b> &nbsp;|&nbsp; Jumlah peti: <b>${ct}</b> &nbsp;|&nbsp; Durasi: <b>3 menit</b>` 
+    : `Tingkat: <b>${df}</b> &nbsp;|&nbsp; Soal: <b>${ct}</b>`;
 }
 
 /* --- GAME SETUP --- */
-function startGame(diff) {
-  state.difficulty = diff;
-  resetGame();
+function initAndStartGame() {
+  if(!state.selDiff || !state.selCount) return;
   
-  // Setup Bank
-  const diffMap = { mudah: db.mudah, sedang: db.sedang, sulit: db.sulit };
-  state.usedQuestions = [...diffMap[diff]].sort(() => Math.random() - 0.5); 
+  // Shuffle Deck
+  const deck = [...db[state.selDiff]].sort(() => Math.random() - 0.5);
+  state.usedQuestions = deck.slice(0, state.selCount);
   
-  // Setup Map & Entities
-  initMap();
-  updatePlayerUI();
-  getEle('ui-diff-label').innerText = diff.toUpperCase();
+  // Reset States
+  const mapSize = MAP_SIZES[state.selCount];
+  state.players.A = { id: 'A', x: mapSize-1, y: mapSize-1, score: 0, chests: 0, ok: 0, bad: 0, state: 'idle', activeChest: null, qId: null };
+  state.players.B = { id: 'B', x: 0, y: 0, score: 0, chests: 0, ok: 0, bad: 0, state: 'idle', activeChest: null, qId: null };
+  state.chestsOpened = 0;
+  state.chests = [];
+  noteTimeouts = { A: null, B: null };
+  
+  initMap(mapSize, state.selCount);
+  updateScoreUI();
+  
+  const idleHtml = '<div class="idle">Jelajahi peta dan temukan peti harta karun!</div>';
+  ['a', 'b'].forEach(p => {
+    $(`#qa-${p}`).innerHTML = idleHtml; 
+    $(`#qa-${p}`).classList.remove('active-qa');
+    setNote(p.toUpperCase(), '');
+  });
+  
+  $('#ui-diff-label').innerText = `${LV_NAME[state.selDiff]} • ${state.selCount} SOAL`;
   showScreen('arena');
   
   state.playing = true;
   state.timer = TIME_LIMIT;
   updateTimerUI();
+  clearInterval(state.interval);
   state.interval = setInterval(gameLoop, 1000);
 }
 
-function resetGame() {
-  clearInterval(state.interval);
+function stopGame() {
   state.playing = false;
-  state.chestsOpened = 0;
-  state.players.A = { id: 'A', x: 8, y: 8, score: 0, chests: 0, correct: 0, wrong: 0, state: 'idle', activeChest: null, qId: null };
-  state.players.B = { id: 'B', x: 0, y: 0, score: 0, chests: 0, correct: 0, wrong: 0, state: 'idle', activeChest: null, qId: null };
-  state.chests = [];
-  
-  const idleHtml = '<div class="qa-idle">Jelajahi peta dan temukan peti harta karun!</div>';
-  getEle('qa-a').innerHTML = idleHtml; getEle('qa-a').classList.remove('active-qa');
-  getEle('qa-b').innerHTML = idleHtml; getEle('qa-b').classList.remove('active-qa');
+  clearInterval(state.interval);
 }
 
 function confirmExit() {
   if(confirm('Yakin ingin keluar? Permainan saat ini akan dibatalkan.')) {
+    stopGame();
     showScreen('home');
   }
 }
 
 /* --- MAP & ENTITIES --- */
-function initMap() {
-  const grid = getEle('map-grid');
-  // Clear old map cells (keep avatars)
-  Array.from(grid.children).forEach(c => {
-    if(!c.classList.contains('avatar-entity')) c.remove();
-  });
+function initMap(size, chestCount) {
+  const grid = $('#grid-bg');
+  grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+  grid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
   
-  // Create Cells
-  for(let i=0; i<MAP_SIZE * MAP_SIZE; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'grid-cell';
-    grid.appendChild(cell);
-  }
-  
-  // Spawn Chests
-  let availableSpots = [];
-  for(let x=0; x<MAP_SIZE; x++){
-    for(let y=0; y<MAP_SIZE; y++){
-      if((x===0 && y===0) || (x===8 && y===8)) continue; // Start pos
-      availableSpots.push({x, y});
+  let h = '';
+  for(let y=0; y<size; y++) {
+    for(let x=0; x<size; x++) {
+      h += `<div class="cell ${(x+y)%2?'alt':''}"></div>`;
     }
   }
-  availableSpots.sort(() => Math.random() - 0.5);
+  grid.innerHTML = h;
   
-  for(let i=0; i<activeTotalChests; i++) {
-    const spot = availableSpots[i];
-    const chest = { id: `c_${i}`, x: spot.x, y: spot.y, status: 'available', claimer: null };
+  const L = $('#layer'); L.innerHTML = '';
+  
+  // Available Spots
+  let spots = [];
+  for(let x=0; x<size; x++){
+    for(let y=0; y<size; y++){
+      if((x===0 && y===0) || (x===size-1 && y===size-1)) continue;
+      spots.push({x, y});
+    }
+  }
+  spots.sort(() => Math.random() - 0.5);
+  
+  for(let i=0; i<chestCount; i++) {
+    const spot = spots[i];
+    const chest = { id: `c_${i}`, x: spot.x, y: spot.y, q: state.usedQuestions[i], status: 'available', by: null };
     state.chests.push(chest);
     
     const el = document.createElement('div');
     el.id = chest.id;
-    el.className = 'entity chest-entity available';
-    el.innerHTML = `<svg class="chest-svg" viewBox="0 0 100 100"><path d="M10,40 L90,40 L85,85 L15,85 Z" fill="#D4AF37" stroke="#8C6E15" stroke-width="3"/><path d="M10,40 C10,15 90,15 90,40 Z" fill="#F1C40F" stroke="#8C6E15" stroke-width="3"/><rect x="42" y="32" width="16" height="16" rx="3" fill="#8C6E15"/><circle cx="50" cy="40" r="4" fill="#333"/><path d="M48,40 L48,46 L52,46 L52,40 Z" fill="#333"/><path d="M15,60 L85,60" stroke="#8C6E15" stroke-width="2"/></svg><div class="lock-icon">🔒</div>`;
-    grid.appendChild(el);
-    updateEntityPos(el, chest.x, chest.y);
+    el.className = 'entity chest-entity';
+    el.innerHTML = `<div class="in">${CHEST}</div>`;
+    place(el, spot.x, spot.y, size);
+    L.appendChild(el);
   }
   
-  // Init Avatars
-  grid.appendChild(getEle('avatar-b')); 
-  grid.appendChild(getEle('avatar-a'));
-  updateEntityPos(getEle('avatar-a'), state.players.A.x, state.players.A.y);
-  updateEntityPos(getEle('avatar-b'), state.players.B.x, state.players.B.y);
-  updateChestCounter();
+  // Avatars
+  ['B', 'A'].forEach(pid => {
+    const el = document.createElement('div');
+    el.id = `avatar-${pid.toLowerCase()}`;
+    el.className = 'entity avatar-entity';
+    el.innerHTML = `<div class="in">${pid==='A'?SVGA:SVGB}</div>`;
+    place(el, state.players[pid].x, state.players[pid].y, size);
+    L.appendChild(el);
+  });
+  
+  updateChestUI();
 }
 
-function updateEntityPos(el, x, y) {
-  el.style.left = `${(x / MAP_SIZE) * 100}%`;
-  el.style.top = `${(y / MAP_SIZE) * 100}%`;
+function place(el, x, y, size) {
+  const u = 100/size;
+  el.style.left = (x*u) + '%';
+  el.style.top = (y*u) + '%';
+  el.style.width = u + '%';
+  el.style.height = u + '%';
 }
 
-/* --- MOVEMENT & INPUT --- */
+/* --- MOVEMENT (Robust & Bug-free) --- */
 function setupKeyboard() {
   window.addEventListener('keydown', (e) => {
-    if(state.screen === 'materi') {
-      if(e.key === 'ArrowRight') nextSlide();
-      if(e.key === 'ArrowLeft') prevSlide();
-    }
+    if(state.screen === 'materi'){ if(e.key==='ArrowRight') nextSlide(); if(e.key==='ArrowLeft') prevSlide(); return; }
     if(!state.playing) return;
     if(keys.hasOwnProperty(e.key)) keys[e.key] = true;
-    
-    // Animate UI Buttons for keyboard
-    if(e.key==='w') highlightBtn('btn-b-up');
-    if(e.key==='a') highlightBtn('btn-b-left');
-    if(e.key==='s') highlightBtn('btn-b-down');
-    if(e.key==='d') highlightBtn('btn-b-right');
-    if(e.key==='ArrowUp') highlightBtn('btn-a-up');
-    if(e.key==='ArrowLeft') highlightBtn('btn-a-left');
-    if(e.key==='ArrowDown') highlightBtn('btn-a-down');
-    if(e.key==='ArrowRight') highlightBtn('btn-a-right');
-
-    processMovement();
+    processKeyboardMove();
   });
   window.addEventListener('keyup', (e) => {
     if(keys.hasOwnProperty(e.key)) keys[e.key] = false;
-    // Remove highlight
-    if(e.key==='w') unhighlightBtn('btn-b-up');
-    if(e.key==='a') unhighlightBtn('btn-b-left');
-    if(e.key==='s') unhighlightBtn('btn-b-down');
-    if(e.key==='d') unhighlightBtn('btn-b-right');
-    if(e.key==='ArrowUp') unhighlightBtn('btn-a-up');
-    if(e.key==='ArrowLeft') unhighlightBtn('btn-a-left');
-    if(e.key==='ArrowDown') unhighlightBtn('btn-a-down');
-    if(e.key==='ArrowRight') unhighlightBtn('btn-a-right');
   });
 }
 
-function highlightBtn(id) { const el = getEle(id); if(el) el.classList.add('pressed'); }
-function unhighlightBtn(id) { const el = getEle(id); if(el) el.classList.remove('pressed'); }
-
-// Handle D-Pad Click/Touch
-function triggerMove(pid, dx, dy, btnId) {
+// Fixed D-Pad Trigger (No setInterval)
+function triggerMove(pid, dx, dy, btnEl) {
   if(!state.playing) return;
   attemptMove(state.players[pid], dx, dy);
-  
-  // Optional button visual feedback for tap
-  const btn = getEle(btnId);
-  if(btn) {
-    btn.classList.add('pressed');
-    setTimeout(() => btn.classList.remove('pressed'), 150);
+  if(btnEl) {
+    btnEl.classList.add('press');
+    setTimeout(() => btnEl.classList.remove('press'), 150);
   }
 }
 
-function processMovement() {
+function processKeyboardMove() {
   const now = Date.now();
-  // Player B (WASD)
+  // Player B
   if(now - lastMoveTime.B > MOVE_COOLDOWN) {
     let dx=0, dy=0;
     if(keys.w) dy = -1; else if(keys.s) dy = 1; else if(keys.a) dx = -1; else if(keys.d) dx = 1;
     if(dx!==0 || dy!==0) attemptMove(state.players.B, dx, dy);
   }
-  // Player A (Arrows)
+  // Player A
   if(now - lastMoveTime.A > MOVE_COOLDOWN) {
     let dx=0, dy=0;
     if(keys.ArrowUp) dy = -1; else if(keys.ArrowDown) dy = 1; else if(keys.ArrowLeft) dx = -1; else if(keys.ArrowRight) dx = 1;
@@ -829,317 +872,245 @@ function processMovement() {
 
 function attemptMove(player, dx, dy) {
   if(player.state !== 'idle' || !state.playing) return;
-  const nx = player.x + dx;
-  const ny = player.y + dy;
-  if(nx < 0 || nx >= MAP_SIZE || ny < 0 || ny >= MAP_SIZE) return; // Bounds
+  const size = MAP_SIZES[state.selCount];
+  const nx = player.x + dx, ny = player.y + dy;
+  const aEl = $(`#avatar-${player.id.toLowerCase()}`);
+  
+  if(nx < 0 || nx >= size || ny < 0 || ny >= size) { bump(aEl); return; }
+  const other = state.players[player.id === 'A' ? 'B' : 'A'];
+  if(other.x === nx && other.y === ny) { bump(aEl); return; }
+  
+  const c = chestAt(nx, ny);
+  if(c && c.status === 'claimed') { setNote(player.id, 'Peti sedang dikerjakan lawan!'); bump(aEl); return; }
   
   player.x = nx; player.y = ny;
   lastMoveTime[player.id] = Date.now();
+  place(aEl, nx, ny, size);
   
-  const avatarEl = getEle(`avatar-${player.id.toLowerCase()}`);
-  avatarEl.classList.add('moving');
-  setTimeout(()=>avatarEl.classList.remove('moving'), 200);
+  aEl.classList.add('moving');
+  setTimeout(() => aEl.classList.remove('moving'), 200);
   
-  updateEntityPos(avatarEl, nx, ny);
-  checkCollision(player);
+  if(c && c.status === 'available') claimTreasure(player, c);
 }
 
-function checkCollision(player) {
-  const chest = state.chests.find(c => c.x === player.x && c.y === player.y);
-  if(!chest) return;
+function chestAt(x, y) { return state.chests.find(c => c.x === x && c.y === y && c.status !== 'opened'); }
+function bump(el) { el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); setTimeout(()=>el.classList.remove('hit'), 400); }
+
+function setNote(pid, txt) {
+  const el = $(`#note-${pid.toLowerCase()}`);
+  el.textContent = txt;
+  if(noteTimeouts[pid]) clearTimeout(noteTimeouts[pid]);
+  if(txt) noteTimeouts[pid] = setTimeout(() => el.textContent = '', 2500);
+}
+
+function claimTreasure(p, c) {
+  c.status = 'claimed'; c.by = p.id;
+  p.state = 'answering'; p.activeChest = c.id; p.qId = c.q;
   
-  if(chest.status === 'available') {
-    chest.status = 'claimed';
-    chest.claimer = player.id;
-    player.state = 'answering';
-    player.activeChest = chest.id;
-    
-    // Update visual
-    const cel = getEle(chest.id);
-    cel.className = `entity chest-entity claimed-${player.id.toLowerCase()}`;
-    getEle(`qa-${player.id.toLowerCase()}`).classList.add('active-qa');
-    
-    // Assign Question
-    if(state.usedQuestions.length === 0) {
-      // reshuffle
-      const diffMap = { mudah: db.mudah, sedang: db.sedang, sulit: db.sulit };
-      state.usedQuestions = [...diffMap[state.difficulty]].sort(() => Math.random() - 0.5);
-    }
-    const q = state.usedQuestions.pop();
-    player.qId = q; 
-    
-    renderQuestion(player, q);
-  }
+  $(`#${c.id}`).classList.add('claimed');
+  $(`#qa-${p.id.toLowerCase()}`).classList.add('active-qa');
+  renderQ(p);
 }
 
 /* --- QUESTION ENGINE --- */
-function renderQuestion(player, q) {
-  const pid = player.id.toLowerCase();
-  const panel = getEle(`qa-${pid}`);
-  let html = `<div class="question-text">${q.q}</div>`;
+function renderQ(p) {
+  const pid = p.id.toLowerCase(), box = $(`#qa-${pid}`), q = p.qId;
+  box.classList.remove('new'); void box.offsetWidth;
+  
+  let html = `<span class="qtype">${q.type==='tf'?'BENAR/SALAH':q.type==='mc'?'PILIHAN GANDA':'PILIH 2 JAWABAN'}</span>`;
+  html += `<div class="qtext">${q.q}</div>`;
   
   if(q.type === 'tf') {
-    html += `<div class="options-grid">
-      <button class="opt-btn" onclick="selectOpt('${player.id}', true, this)">BENAR</button>
-      <button class="opt-btn" onclick="selectOpt('${player.id}', false, this)">SALAH</button>
-    </div>`;
+    html += `<div class="tf-wrap"><button class="ans tf" onclick="selOpt('${p.id}', true, this)">BENAR</button><button class="ans tf" onclick="selOpt('${p.id}', false, this)">SALAH</button></div>`;
   } else if(q.type === 'mc') {
-    html += `<div class="options-grid">`;
-    q.opt.forEach((o, i) => {
-      html += `<button class="opt-btn" onclick="selectOpt('${player.id}', ${i}, this)">${o}</button>`;
-    });
-    html += `</div>`;
-  } else if(q.type === 'ms') {
-    html += `<p style="font-size:0.9rem; color:var(--danger); margin-bottom:8px; font-weight:bold;">* Pilih tepat 2 jawaban</p><div class="options-grid">`;
-    q.opt.forEach((o, i) => {
-      html += `<button class="opt-btn ms-opt" onclick="toggleMultiOpt('${player.id}', ${i}, this)">${o}</button>`;
-    });
-    html += `</div><button class="submit-ans" id="btn-sub-${pid}" onclick="submitMulti('${player.id}')" disabled>Kirim Jawaban</button>`;
+    html += `<div class="options-grid">` + q.opt.map((o,i) => `<button class="ans" onclick="selOpt('${p.id}', ${i}, this)"><b>${['A','B','C','D'][i]}.</b> ${o}</button>`).join('') + `</div>`;
+  } else {
+    html += `<div class="options-grid">` + q.opt.map((o,i) => `<label class="ans"><input type="checkbox" onchange="toggleOpt('${p.id}', ${i}, this)">${o}</label>`).join('') + `</div><button class="btn gold" id="sub-${pid}" disabled style="width:100%; margin-top:10px;" onclick="subMulti('${p.id}')">Konfirmasi Jawaban</button>`;
   }
   
-  html += `<div class="feedback-box" id="fb-${pid}"></div>`;
-  panel.innerHTML = html;
+  html += `<div class="fb" id="fb-${pid}" style="display:none;"></div>`;
+  box.innerHTML = html;
+  box.classList.add('new');
 }
 
-const selections = { A: [], B: [] };
+let mSel = { A: [], B: [] };
 
-function selectOpt(pId, val, btn) {
-  if(!state.playing || state.players[pId].state !== 'answering') return;
-  const pIdLow = pId.toLowerCase();
-  document.querySelectorAll(`#qa-${pIdLow} .opt-btn`).forEach(b => b.classList.remove('selected'));
+function selOpt(pid, val, btn) {
+  const p = state.players[pid]; if(!state.playing || p.state !== 'answering') return;
+  $$(`#qa-${pid.toLowerCase()} .ans`).forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
-  resolveAnswer(pId, [val]);
+  evalAns(p, [val]);
 }
 
-function toggleMultiOpt(pId, val, btn) {
-  if(!state.playing || state.players[pId].state !== 'answering') return;
-  const pIdLow = pId.toLowerCase();
-  if(btn.classList.contains('selected')) {
-    btn.classList.remove('selected');
-    selections[pId] = selections[pId].filter(v => v !== val);
-  } else {
-    if(selections[pId].length >= 2) return; 
-    btn.classList.add('selected');
-    selections[pId].push(val);
-  }
-  const subBtn = getEle(`btn-sub-${pIdLow}`);
-  if(subBtn) subBtn.disabled = selections[pId].length !== 2;
-}
-
-function submitMulti(pId) {
-  if(!state.playing || state.players[pId].state !== 'answering') return;
-  if(selections[pId].length === 2) {
-    resolveAnswer(pId, selections[pId]);
-    selections[pId] = []; 
-    getEle(`btn-sub-${pId.toLowerCase()}`).style.display = 'none';
-  }
-}
-
-function resolveAnswer(pId, ansArr) {
-  const p = state.players[pId];
-  if(p.state !== 'answering') return; 
-  p.state = 'resolving'; 
+function toggleOpt(pid, val, cb) {
+  const p = state.players[pid]; if(!state.playing || p.state !== 'answering') return;
+  if(cb.checked) { if(mSel[pid].length < 2) mSel[pid].push(val); else cb.checked = false; }
+  else mSel[pid] = mSel[pid].filter(v => v !== val);
   
-  const q = p.qId;
-  let isCorrect = false;
+  cb.parentElement.classList.toggle('chk', cb.checked);
+  $(`#sub-${pid.toLowerCase()}`).disabled = mSel[pid].length !== 2;
+}
+
+function subMulti(pid) {
+  const p = state.players[pid]; if(!state.playing || p.state !== 'answering') return;
+  if(mSel[pid].length === 2) { evalAns(p, mSel[pid]); mSel[pid] = []; $(`#sub-${pid.toLowerCase()}`).style.display = 'none'; }
+}
+
+function evalAns(p, ans) {
+  p.state = 'resolving';
+  const q = p.qId, pid = p.id.toLowerCase();
+  let ok = false;
   
+  if(q.type === 'tf' || q.type === 'mc') ok = (ans[0] === q.a);
+  else ok = ans.length === 2 && ans.every(v => q.a.includes(v));
+  
+  const fb = $(`#fb-${pid}`);
+  const btns = $$(`#qa-${pid} .ans`);
+  
+  // Highlight
   if(q.type === 'tf' || q.type === 'mc') {
-    isCorrect = (ansArr[0] === q.a);
-  } else if(q.type === 'ms') {
-    isCorrect = ansArr.length === 2 && ansArr.every(v => q.a.includes(v));
-  }
-  
-  const fb = getEle(`fb-${pId.toLowerCase()}`);
-  const btns = document.querySelectorAll(`#qa-${pId.toLowerCase()} .opt-btn`);
-  
-  if(q.type === 'tf' || q.type === 'mc') {
-     btns.forEach(b => {
-       if(b.classList.contains('selected')) b.classList.add(isCorrect ? 'correct' : 'wrong');
-     });
+     btns.forEach(b => { if(b.classList.contains('selected')) b.classList.add(ok ? 'correct' : 'wrong'); });
   } else {
-     btns.forEach(b => {
-       if(b.classList.contains('selected')) {
-         const idx = Array.from(btns).indexOf(b);
-         if(q.a.includes(idx)) b.classList.add('correct');
+     btns.forEach((b, i) => {
+       if(b.classList.contains('chk')) {
+         if(q.a.includes(i)) b.classList.add('correct');
          else b.classList.add('wrong');
        }
      });
   }
 
-  fb.innerHTML = `<div>${isCorrect ? 'BENAR! Harta Karun Terbuka!' : 'BELUM TEPAT!'}</div><div style="font-weight:normal; margin-top:8px; font-size:0.95rem;">${q.exp}</div>`;
-  fb.className = `feedback-box show ${isCorrect ? 'correct' : 'wrong'}`;
+  const pts = PTS[state.selDiff];
+  fb.style.display = 'block';
+  fb.className = `fb ${ok ? 'ok' : 'no'}`;
+  fb.innerHTML = `<h3>${ok ? 'BENAR! HARTA KARUN DIBUKA!' : 'BELUM TEPAT!'}</h3>${ok ? `<p><b>+${pts} Poin</b></p>` : ''}<p style="margin-top:6px;">${q.exp}</p>`;
   
-  const chest = state.chests.find(c => c.id === p.activeChest);
+  const c = state.chests.find(x => x.id === p.activeChest);
   
-  if(isCorrect) {
-    const pts = state.difficulty === 'mudah' ? 10 : (state.difficulty === 'sedang' ? 20 : 30);
-    p.score += pts;
-    p.chests++;
-    p.correct++;
-    state.chestsOpened++;
-    
-    const cel = getEle(chest.id);
-    cel.className = 'entity chest-entity opened';
-    chest.status = 'opened';
-    
-    createParticles(chest.x, chest.y);
+  if(ok) {
+    p.score += pts; p.chests++; p.ok++; state.chestsOpened++;
+    c.status = 'opened';
+    const cel = $(`#${c.id}`); cel.classList.remove('claimed'); cel.classList.add('opened');
+    setTimeout(() => cel.style.display = 'none', 700);
+    spawnCoins(c.x, c.y);
   } else {
-    p.wrong++;
-    chest.status = 'available';
-    chest.claimer = null;
-    const cel = getEle(chest.id);
-    cel.className = 'entity chest-entity available';
-    
-    knockbackPlayer(p);
+    p.bad++; c.status = 'available'; c.by = null;
+    $(`#${c.id}`).classList.remove('claimed');
+    knockback(p, c);
   }
   
-  updatePlayerUI();
-  updateChestCounter();
+  updateScoreUI(); updateChestUI();
   
   setTimeout(() => {
     if(!state.playing) return;
-    p.state = 'idle';
-    p.activeChest = null;
-    p.qId = null;
-    const qaPanel = getEle(`qa-${pId.toLowerCase()}`);
-    qaPanel.innerHTML = '<div class="qa-idle">Jelajahi peta dan temukan peti harta karun!</div>';
-    qaPanel.classList.remove('active-qa');
-    checkWinCondition();
-  }, 3500); 
+    p.state = 'idle'; p.activeChest = null; p.qId = null;
+    const qa = $(`#qa-${pid}`);
+    qa.innerHTML = '<div class="idle">Jelajahi peta dan temukan peti harta karun!</div>';
+    qa.classList.remove('active-qa');
+    checkWin();
+  }, 3800);
 }
 
-function knockbackPlayer(p) {
-  const queue = [{x: p.x, y: p.y}];
-  const visited = new Set([`${p.x},${p.y}`]);
-  let target = null;
-  
-  const dirs = [[0,-1], [1,0], [0,1], [-1,0]];
-  
-  while(queue.length > 0) {
-    const curr = queue.shift();
-    const hasChest = state.chests.some(c => c.x === curr.x && c.y === curr.y && c.status !== 'opened');
-    if(!hasChest) {
-      target = curr; break;
-    }
-    
-    for(let d of dirs) {
-      const nx = curr.x + d[0], ny = curr.y + d[1];
-      const key = `${nx},${ny}`;
-      if(nx>=0 && nx<MAP_SIZE && ny>=0 && ny<MAP_SIZE && !visited.has(key)) {
-        visited.add(key); queue.push({x:nx, y:ny});
+function knockback(p, c) {
+  const size = MAP_SIZES[state.selCount], o = state.players[p.id==='A'?'B':'A'];
+  const busy = (x,y) => x<0 || y<0 || x>=size || y>=size || (o.x===x && o.y===y) || !!chestAt(x,y);
+  let t = null;
+  for(let d=1; d<=2*size && !t; d++) {
+    for(let dx=-d; dx<=d && !t; dx++) {
+      for(const dy of (d-Math.abs(dx) ? [d-Math.abs(dx), -(d-Math.abs(dx))] : [0])) {
+        const x = c.x+dx, y = c.y+dy; if(!busy(x,y)){ t = [x,y]; break; }
       }
     }
   }
+  if(!t) t = [p.id==='A'?size-1:0, size-1];
   
-  if(target) {
-    p.x = target.x; p.y = target.y;
-    const ael = getEle(`avatar-${p.id.toLowerCase()}`);
-    ael.style.transition = '0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-    updateEntityPos(ael, p.x, p.y);
-    setTimeout(() => { ael.style.transition = 'left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'; }, 400);
+  p.x = t[0]; p.y = t[1];
+  const ael = $(`#avatar-${p.id.toLowerCase()}`);
+  bump(ael);
+  setTimeout(() => place(ael, t[0], t[1], size), 200);
+}
+
+function spawnCoins(cx, cy) {
+  const L = $('#layer'), u = 100/MAP_SIZES[state.selCount];
+  for(let i=0; i<8; i++){
+    const e = document.createElement('div'); e.className = 'cn';
+    e.style.left = (cx+0.4)*u + '%'; e.style.top = (cy+0.4)*u + '%';
+    const a = (i/8)*6.283;
+    e.style.setProperty('--x', Math.cos(a)*50+'px'); e.style.setProperty('--y', Math.sin(a)*50-20+'px');
+    L.appendChild(e); setTimeout(()=>e.remove(), 800);
   }
 }
 
-function createParticles(x, y) {
-  const container = getEle('map-grid');
-  for(let i=0; i<12; i++) {
-    const p = document.createElement('div');
-    p.style.position = 'absolute'; p.style.width = '12px'; p.style.height = '12px';
-    p.style.background = '#F1C40F'; p.style.borderRadius = '50%'; p.style.zIndex = '10';
-    p.style.boxShadow = '0 0 10px #F1C40F';
-    p.style.left = `calc(${(x/MAP_SIZE)*100}% + 20px)`;
-    p.style.top = `calc(${(y/MAP_SIZE)*100}% + 20px)`;
-    
-    const angle = Math.random() * Math.PI * 2;
-    const dist = Math.random() * 60 + 20;
-    const tx = Math.cos(angle) * dist; const ty = Math.sin(angle) * dist;
-    
-    p.style.transition = 'all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)';
-    container.appendChild(p);
-    
-    setTimeout(() => { p.style.transform = `translate(${tx}px, ${ty}px) scale(0)`; p.style.opacity = '0'; }, 10);
-    setTimeout(() => p.remove(), 600);
-  }
+/* --- HUD & TIMER --- */
+function updateScoreUI() {
+  ['A', 'B'].forEach(pid => {
+    const p = state.players[pid], lo = pid.toLowerCase();
+    const tot = p.ok + p.bad; const acc = tot ? Math.round((p.ok/tot)*100) : 0;
+    $(`#score-${lo}`).innerText = p.score;
+    $(`#stat-open-${lo}`).innerText = p.chests;
+    $(`#stat-ok-${lo}`).innerText = p.ok;
+    $(`#stat-bad-${lo}`).innerText = p.bad;
+    $(`#stat-acc-${lo}`).innerText = acc + '%';
+  });
 }
+function updateChestUI() { $('#ui-chests').innerText = `Terbuka: ${state.chestsOpened} • Sisa: ${state.selCount - state.chestsOpened}`; }
 
-/* --- TIMER & SCORING --- */
 function gameLoop() {
   if(!state.playing) return;
-  state.timer--;
-  updateTimerUI();
-  if(state.timer <= 0) {
-    endGame('Waktu Habis!');
-  }
+  state.timer--; updateTimerUI();
+  if(state.timer <= 0) endGame('Waktu 3 menit habis!');
 }
-
 function updateTimerUI() {
-  const m = Math.floor(state.timer / 60).toString().padStart(2, '0');
-  const s = (state.timer % 60).toString().padStart(2, '0');
-  const el = getEle('ui-timer');
-  el.innerText = `${m}:${s}`;
-  if(state.timer <= 30) el.classList.add('warning');
-  else el.classList.remove('warning');
+  const m = Math.floor(state.timer/60).toString().padStart(2,'0'), s = (state.timer%60).toString().padStart(2,'0');
+  const el = $('#ui-timer'); el.innerText = `${m}:${s}`;
+  if(state.timer <= 30) el.classList.add('low'); else el.classList.remove('low');
 }
 
-function updatePlayerUI() {
-  getEle('score-a').innerText = state.players.A.score;
-  getEle('chest-a').innerText = state.players.A.chests;
-  getEle('score-b').innerText = state.players.B.score;
-  getEle('chest-b').innerText = state.players.B.chests;
+function checkWin() {
+  if(state.chestsOpened >= state.selCount) endGame('Seluruh harta karun berhasil ditemukan!');
 }
 
-function updateChestCounter() {
-  getEle('ui-chests').innerText = `${state.chestsOpened}/${activeTotalChests}`;
-}
-
-function checkWinCondition() {
-  if(state.chestsOpened >= activeTotalChests) {
-    endGame('Semua Harta Karun Telah Ditemukan!');
-  }
-}
-
+/* --- RESULTS --- */
 function endGame(reason) {
-  state.playing = false;
-  clearInterval(state.interval);
+  stopGame();
   
-  let a = state.players.A, b = state.players.B;
-  let accA = a.correct+a.wrong > 0 ? Math.round((a.correct/(a.correct+a.wrong))*100) : 0;
-  let accB = b.correct+b.wrong > 0 ? Math.round((b.correct/(b.correct+b.wrong))*100) : 0;
+  const a = state.players.A, b = state.players.B;
+  const getAcc = (p) => (p.ok+p.bad) ? Math.round((p.ok/(p.ok+p.bad))*100) : 0;
+  const aa = getAcc(a), ab = getAcc(b);
   
-  let winner = 'SERI';
-  if(a.score > b.score) winner = 'A';
-  else if(b.score > a.score) winner = 'B';
-  else {
-    if(a.chests > b.chests) winner = 'A';
-    else if(b.chests > a.chests) winner = 'B';
-    else {
-      if(accA > accB) winner = 'A';
-      else if(accB > accA) winner = 'B';
-    }
-  }
+  let w = -1; // 0=A, 1=B, -1=Tie
+  if(a.score !== b.score) w = a.score > b.score ? 0 : 1;
+  else if(a.chests !== b.chests) w = a.chests > b.chests ? 0 : 1;
+  else if(aa !== ab) w = aa > ab ? 0 : 1;
   
-  getEle('res-title').innerText = winner === 'SERI' ? 'PERTANDINGAN SERI!' : `PLAYER ${winner} MENJADI JUARA!`;
-  getEle('res-reason').innerText = reason;
+  $('#res-title').innerText = w === -1 ? 'PERTANDINGAN SERI!' : `PLAYER ${w === 0 ? '1' : '2'} MENJADI JUARA!`;
+  $('#res-reason').innerText = reason;
   
-  const bindStat = (pId, statObj, acc) => {
-    getEle(`r-score-${pId}`).innerText = statObj.score;
-    getEle(`r-chest-${pId}`).innerText = statObj.chests;
-    getEle(`r-ans-${pId}`).innerText = `${statObj.correct} / ${statObj.wrong}`;
-    getEle(`r-acc-${pId}`).innerText = `${acc}%`;
-    const card = getEle(`stat-${pId}`);
-    card.classList.remove('winner');
-    if(winner === pId.toUpperCase()) card.classList.add('winner');
+  const bind = (pid, p, acc, isWin) => {
+    const lo = pid.toLowerCase();
+    $(`#r-score-${lo}`).innerText = p.score; $(`#r-chest-${lo}`).innerText = p.chests;
+    $(`#r-ok-${lo}`).innerText = p.ok; $(`#r-bad-${lo}`).innerText = p.bad;
+    $(`#r-acc-${lo}`).innerText = acc + '%';
+    $(`#res-card-${lo}`).className = `rc ${isWin?'win':''}`;
+    $(`#crown-${lo}`).innerText = isWin ? ' 🏆' : '';
   };
   
-  bindStat('a', a, accA);
-  bindStat('b', b, accB);
+  bind('A', a, aa, w === 0);
+  bind('B', b, ab, w === 1);
   
   showScreen('result');
+  
+  if(w !== -1) {
+    for(let i=0; i<60; i++){
+      const e = document.createElement('i'); e.className = 'conf';
+      e.style.left = Math.random()*100+'vw';
+      e.style.background = ['#f5b82e', '#12b5c9', '#ff7a45', '#10a37f'][i%4];
+      e.style.animationDuration = 2+Math.random()*2+'s'; e.style.animationDelay = Math.random()*.8+'s';
+      document.body.appendChild(e); setTimeout(()=>e.remove(), 5000);
+    }
+  }
 }
 
-// Start sequence
 window.onload = init;
-
 </script>
 </body>
 </html>
