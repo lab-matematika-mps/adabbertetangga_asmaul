@@ -76,10 +76,7 @@ h1, h2, h3 { line-height: 1.15; font-weight: 800; }
 
 /* STAGE ANIMATIONS */
 .stage { display: flex; justify-content: center; align-items: flex-end; gap: clamp(8px, 4vw, 50px); margin: 20px 0; }
-.stage .big { width: clamp(70px, 12vw, 130px); animation: float 3s ease-in-out infinite; }
-.stage .big:nth-child(3) { animation-delay: 1.2s; }
 .stage .chestbig { width: clamp(100px, 16vw, 170px); position: relative; filter: drop-shadow(0 0 14px #ffd45c); animation: glow 2.4s infinite; }
-@keyframes float { 50% { transform: translateY(-12px); } }
 @keyframes glow { 50% { filter: drop-shadow(0 0 30px #fff2a8); } }
 .coin { position: absolute; width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(#fff2a8, var(--accent) 60%, var(--amb)); animation: spin 1.6s linear infinite; }
 @keyframes spin { 50% { transform: scaleX(0.15); } }
@@ -141,7 +138,6 @@ h1, h2, h3 { line-height: 1.15; font-weight: 800; }
 #panel-a { --c: var(--player-a); } /* Right = Player 1 */
 
 .ph { display: flex; align-items: center; gap: 10px; }
-.ph svg { width: 50px; flex: none; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)); }
 .ph h3 { flex: 1; font-size: 1.15rem; color: var(--text-dark); }
 .ph .sc { font-size: 2.5rem; font-weight: 900; color: var(--c); text-shadow: 0 2px 0 rgba(0,0,0,0.2); }
 
@@ -235,8 +231,6 @@ h1, h2, h3 { line-height: 1.15; font-weight: 800; }
 .rs { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
 .rc { background: var(--bg-cream); border-radius: 22px; padding: 20px; border: 6px solid var(--c); text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.4); transition: 0.4s; }
 .rc.win { box-shadow: 0 0 40px var(--accent-glow); animation: pop 1s 2; transform: scale(1.05) translateY(-10px); z-index: 2; border-color: var(--accent); }
-.rc svg { width: 100px; display: block; margin: 0 auto 15px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); }
-.rc.win svg { animation: float 1.5s ease-in-out infinite; }
 .rc table { width: 100%; font-weight: 700; font-size: 1.15rem; color: var(--text-dark); }
 .rc td { padding: 6px 0; border-bottom: 1px dashed #ccc; }
 .rc tr:last-child td { border-bottom: none; }
@@ -396,7 +390,6 @@ h1, h2, h3 { line-height: 1.15; font-weight: 800; }
     <!-- Player B Panel (Kiri - Orange) -->
     <div class="panel" id="panel-b">
       <div class="ph">
-        <div id="av-b-ui"></div>
         <h3>Player 2 (WASD)</h3>
         <span class="sc" id="score-b">0</span>
       </div>
@@ -430,7 +423,6 @@ h1, h2, h3 { line-height: 1.15; font-weight: 800; }
     <!-- Player A Panel (Kanan - Cyan) -->
     <div class="panel" id="panel-a">
       <div class="ph">
-        <div id="av-a-ui"></div>
         <h3>Player 1 (Panah)</h3>
         <span class="sc" id="score-a">0</span>
       </div>
@@ -460,7 +452,6 @@ h1, h2, h3 { line-height: 1.15; font-weight: 800; }
     <div class="rs">
       <!-- Card B (Left) -->
       <div class="rc" id="res-card-b" style="--c: var(--player-b)">
-        <div id="res-av-b"></div>
         <h3 style="text-align:center; font-size:1.8rem; margin-bottom:15px; color:var(--text-dark);">Player 2 <span id="crown-b"></span></h3>
         <table>
           <tr><td>Skor Akhir</td><td id="r-score-b">0</td></tr>
@@ -472,7 +463,6 @@ h1, h2, h3 { line-height: 1.15; font-weight: 800; }
       </div>
       <!-- Card A (Right) -->
       <div class="rc" id="res-card-a" style="--c: var(--player-a)">
-        <div id="res-av-a"></div>
         <h3 style="text-align:center; font-size:1.8rem; margin-bottom:15px; color:var(--text-dark);">Player 1 <span id="crown-a"></span></h3>
         <table>
           <tr><td>Skor Akhir</td><td id="r-score-a">0</td></tr>
@@ -633,12 +623,8 @@ let noteTimeouts = { A: null, B: null };
 function init() {
   generateParticles();
   
-  // Inject SVGs to Home
-  $('#homeStage').innerHTML = `<div class="big">${SVGB}</div><div class="chestbig">${CHEST}<span class="coin" style="left:-10px;top:10px"></span><span class="coin" style="right:-8px;top:30px;animation-delay:.6s"></span></div><div class="big">${SVGA}</div>`;
-  
-  // Inject SVGs to Panels & Results
-  $('#av-b-ui').innerHTML = SVGB; $('#av-a-ui').innerHTML = SVGA;
-  $('#res-av-b').innerHTML = SVGB; $('#res-av-a').innerHTML = SVGA;
+  // Inject SVGs to Home (Gambar Orang / Avatar dihapus, disisakan Peti Harta Karun Saja)
+  $('#homeStage').innerHTML = `<div class="chestbig">${CHEST}<span class="coin" style="left:-10px;top:10px"></span><span class="coin" style="right:-8px;top:30px;animation-delay:.6s"></span></div>`;
   
   // Setup D-Pads
   ['a', 'b'].forEach(p => {
@@ -810,7 +796,7 @@ function initMap(size, chestCount) {
     L.appendChild(el);
   }
   
-  // Avatars
+  // Avatars (Tetap ada di dalam PETA agar bisa dimainkan)
   ['B', 'A'].forEach(pid => {
     const el = document.createElement('div');
     el.id = `avatar-${pid.toLowerCase()}`;
